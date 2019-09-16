@@ -4,10 +4,13 @@ import static ca.mcgill.ecse211.lab1.Resources.*;
 
 public class PController extends UltrasonicController {
 
+  // Constants
   private static final int MOTOR_SPEED = 200;
+  private static final int P_CONSTANT = 3;
+
 
   public PController() {
-    LEFT_MOTOR.setSpeed(MOTOR_SPEED); // Initialize motor rolling forward
+    LEFT_MOTOR.setSpeed(MOTOR_SPEED);
     RIGHT_MOTOR.setSpeed(MOTOR_SPEED);
     LEFT_MOTOR.forward();
     RIGHT_MOTOR.forward();
@@ -15,47 +18,61 @@ public class PController extends UltrasonicController {
 
   @Override
   public void processUSData(int distance) {
+
+    /**
+     * 1. Calculate the delta
+     * 2. If robot is too close from wall
+     * 3. If robot is far close from wall
+     * 4. If robot is within range, don't change the speed.
+     */
+
     filter(distance);
 
     // TODO: process a movement based on the us distance passed in (P style)
 
-    int diff = distance - BAND_CENTER - (BAND_WIDTH / 2);
-    int deltaSpeed = 0;
 
-    if (diff > BAND_WIDTH) { // Robot is too far from wall
-      if (diff > 28) { // Robot is very far from wall
-        deltaSpeed = 100 + (500 / diff);
+    // Initialize speed variables for both motors
+    int leftMotorSpeed = 0;
+    int rightMotorSpeed = 0;
 
-        // Make wider turn
-        LEFT_MOTOR.setSpeed(MOTOR_SPEED - (deltaSpeed / 2));
-        RIGHT_MOTOR.setSpeed(MOTOR_SPEED + (deltaSpeed / 2));
-        LEFT_MOTOR.forward();
-        RIGHT_MOTOR.forward();
-        return;
-      }
+    // Calculate delta
+    int error = Math.abs(distance - BAND_CENTER);
+    int deltaSpeed = error * P_CONSTANT;
 
-      deltaSpeed = (diff * 3);
-    } else if (diff < BAND_WIDTH) { // Robot is too close to wall
-      if (diff < -5) { // Robot is very close to wall
-        deltaSpeed = -140 + diff;
+    if(deltaSpeed > 30) {
+      deltaSpeed = 30;
+    }
 
-        // Change direction in place
-        LEFT_MOTOR.setSpeed(deltaSpeed);
-        RIGHT_MOTOR.setSpeed(Math.abs(deltaSpeed));
+    // 1. If in acceptable range, keep on truckin'
+    if (distance >= BAND_CENTER - (BAND_WIDTH / 2) && distance <= BAND_CENTER + (BAND_WIDTH / 2)) {
+      leftMotorSpeed = MOTOR_SPEED;
+      rightMotorSpeed = MOTOR_SPEED;
+    }
+    // 2. If too close, adjust a little
+    else if (distance < BAND_CENTER - BAND_WIDTH / 2) {
+      // 2. b) If really too close, adjust a lot
+      if (distance < BAND_CENTER - BAND_WIDTH) {
+        LEFT_MOTOR.setSpeed(MOTOR_SPEED + deltaSpeed * 2);
+        RIGHT_MOTOR.setSpeed(MOTOR_SPEED + deltaSpeed * 2);
         LEFT_MOTOR.forward();
         RIGHT_MOTOR.backward();
         return;
       }
-
-      deltaSpeed = (diff * 8);
-    } else { // Within band
-      deltaSpeed = 0;
+      leftMotorSpeed = MOTOR_SPEED + deltaSpeed * 3;
+      rightMotorSpeed = MOTOR_SPEED - deltaSpeed / 2;
     }
-
-    LEFT_MOTOR.setSpeed(MOTOR_SPEED - deltaSpeed);
-    RIGHT_MOTOR.setSpeed(MOTOR_SPEED + deltaSpeed);
+    // 3. If too far
+    else {
+      leftMotorSpeed = MOTOR_SPEED - deltaSpeed / 2;
+      rightMotorSpeed = MOTOR_SPEED + deltaSpeed * 5;
+    }
+    // Set speed of motors
+    LEFT_MOTOR.setSpeed(leftMotorSpeed);
+    RIGHT_MOTOR.setSpeed(rightMotorSpeed);
+    // Make robot move forward
     LEFT_MOTOR.forward();
     RIGHT_MOTOR.forward();
+    return;
   }
 
 

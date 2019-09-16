@@ -4,7 +4,7 @@ import static ca.mcgill.ecse211.lab1.Resources.*;
 
 public class BangBangController extends UltrasonicController {
 
-  public static int TOO_CLOSE = 15;
+  private static final int TOO_CLOSE = 15;
 
   public BangBangController() {
     LEFT_MOTOR.setSpeed(MOTOR_HIGH); // Start robot moving forward
@@ -12,7 +12,6 @@ public class BangBangController extends UltrasonicController {
     LEFT_MOTOR.forward();
     RIGHT_MOTOR.forward();
   }
-  //Test
 
   @Override
   public void processUSData(int distance) {
