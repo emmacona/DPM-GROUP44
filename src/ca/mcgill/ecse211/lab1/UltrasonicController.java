@@ -1,6 +1,6 @@
-package ca.mcgill.ecse211.lab1;
+package src.ca.mcgill.ecse211.lab1;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
+import static src.ca.mcgill.ecse211.lab1.Resources.*;
 
 /**
  * Controller that controls the robot's movements based on ultrasonic data.

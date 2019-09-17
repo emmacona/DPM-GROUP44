@@ -1,4 +1,4 @@
-package ca.mcgill.ecse211.lab1;
+package src.ca.mcgill.ecse211.lab1;
 
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;

@@ -1,6 +1,6 @@
-package ca.mcgill.ecse211.lab1;
+package src.ca.mcgill.ecse211.lab1;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
+import static src.ca.mcgill.ecse211.lab1.Resources.*;
 
 /**
  * The printer thread prints status information in the background. Since the thread sleeps for 

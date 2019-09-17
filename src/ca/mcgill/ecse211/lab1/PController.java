@@ -1,6 +1,6 @@
-package ca.mcgill.ecse211.lab1;
+package src.ca.mcgill.ecse211.lab1;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
+import static src.ca.mcgill.ecse211.lab1.Resources.*;
 
 public class PController extends UltrasonicController {
 
@@ -20,10 +20,10 @@ public class PController extends UltrasonicController {
   public void processUSData(int distance) {
 
     /**
-     * 1. Calculate the delta
-     * 2. If robot is too close from wall
-     * 3. If robot is far close from wall
-     * 4. If robot is within range, don't change the speed.
+     * 1. Calculate the error
+     * 2. If robot is within range, don't change the speed.
+     * 3. If robot is too close from wall
+     * 4. If robot is far close from wall
      */
 
     filter(distance);
@@ -35,7 +35,7 @@ public class PController extends UltrasonicController {
     int leftMotorSpeed = 0;
     int rightMotorSpeed = 0;
 
-    // Calculate delta
+    // 1. Calculate delta
     int error = Math.abs(distance - BAND_CENTER);
     int deltaSpeed = error * P_CONSTANT;
 
@@ -43,12 +43,12 @@ public class PController extends UltrasonicController {
       deltaSpeed = 30;
     }
 
-    // 1. If in acceptable range, keep on truckin'
+    // 2. If in acceptable range, keep on truckin'
     if (distance >= BAND_CENTER - (BAND_WIDTH / 2) && distance <= BAND_CENTER + (BAND_WIDTH / 2)) {
       leftMotorSpeed = MOTOR_SPEED;
       rightMotorSpeed = MOTOR_SPEED;
     }
-    // 2. If too close, adjust a little
+    // 3. If too close, adjust a little
     else if (distance < BAND_CENTER - BAND_WIDTH / 2) {
       // 2. b) If really too close, adjust a lot
       if (distance < BAND_CENTER - BAND_WIDTH) {
@@ -66,10 +66,9 @@ public class PController extends UltrasonicController {
       leftMotorSpeed = MOTOR_SPEED - deltaSpeed / 2;
       rightMotorSpeed = MOTOR_SPEED + deltaSpeed * 5;
     }
-    // Set speed of motors
+    
     LEFT_MOTOR.setSpeed(leftMotorSpeed);
     RIGHT_MOTOR.setSpeed(rightMotorSpeed);
-    // Make robot move forward
     LEFT_MOTOR.forward();
     RIGHT_MOTOR.forward();
     return;

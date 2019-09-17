@@ -1,10 +1,10 @@
-package ca.mcgill.ecse211.lab1;
+package src.ca.mcgill.ecse211.lab1;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
+import static src.ca.mcgill.ecse211.lab1.Resources.*;
 
 public class BangBangController extends UltrasonicController {
 
-  private static final int TOO_CLOSE = 15;
+  private static final int TOO_CLOSE = BAND_CENTER - BAND_WIDTH;
 
   public BangBangController() {
     LEFT_MOTOR.setSpeed(MOTOR_HIGH); // Start robot moving forward
@@ -16,10 +16,10 @@ public class BangBangController extends UltrasonicController {
   @Override
   public void processUSData(int distance) {
     /**
-     * 1. If robot is within range, just keep both motors fast.
+     * 1. If robot is too far from the wall, right motor faster and left slower to turn to left.
      * 2. a) If robot is too close, make left motor faster and right motor slower to turn right.
      *    b) If robot is really too close, set both motor speed to fast and move backwards.
-     * 3. If robot is too far from the wall, right motor faster and left slower to turn to left.
+     * 3. If robot is within range, just keep both motors fast.
      */
 
     // Check to see if magnitude is within bounds
@@ -29,13 +29,10 @@ public class BangBangController extends UltrasonicController {
     int leftMotorSpeed = 0;
     int rightMotorSpeed = 0;
     
-    // PROBLEM:
-    // when distance is really low, both motors go full speed
-    // but they should be in the TOO_CLOSE range
 
-    // 1. If in acceptable range, keep on truckin'
-    if (distance >= BAND_CENTER - (BAND_WIDTH / 2) && distance <= BAND_CENTER + (BAND_WIDTH / 2)) {
-      leftMotorSpeed = MOTOR_HIGH;
+    // 1. Too far
+    if (distance > BAND_CENTER + BAND_WIDTH / 2) {
+      leftMotorSpeed = MOTOR_LOW;
       rightMotorSpeed = MOTOR_HIGH;
     }
     // 2. a) If too close, adjust a little
@@ -51,9 +48,9 @@ public class BangBangController extends UltrasonicController {
       leftMotorSpeed = MOTOR_HIGH;
       rightMotorSpeed = MOTOR_LOW;
     }
-    // 3. If neither too close or in acceptable band, steer closer to wall
+    // 3. If in acceptable range
     else {
-      leftMotorSpeed = MOTOR_LOW;
+      leftMotorSpeed = MOTOR_HIGH;
       rightMotorSpeed = MOTOR_HIGH;
     }
 
