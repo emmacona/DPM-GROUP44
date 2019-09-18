@@ -1,8 +1,8 @@
-package src.ca.mcgill.ecse211.lab1;
+package ca.mcgill.ecse211.lab1;
 
 import lejos.hardware.Button;
 
-import static src.ca.mcgill.ecse211.lab1.Resources.*;
+import static ca.mcgill.ecse211.lab1.Resources.*;
 
 /**
  * Main class of the program.
