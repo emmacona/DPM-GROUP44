@@ -103,6 +103,7 @@ public class Odometer implements Runnable {
 
       // TODO Calculate new robot position based on tachometer counts
       
+      
       // TODO Update odometer values with new calculated values, eg
       //odo.update(dx, dy, dtheta);
 

@@ -28,8 +28,6 @@ public class PController extends UltrasonicController {
 
     filter(distance);
 
-    // TODO: process a movement based on the us distance passed in (P style)
-
 
     // Initialize speed variables for both motors
     int leftMotorSpeed = 0;
