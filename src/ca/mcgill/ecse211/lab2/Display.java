@@ -1,7 +1,6 @@
 package ca.mcgill.ecse211.lab2;
 
 import java.text.DecimalFormat;
-import lejos.hardware.lcd.TextLCD;
 
 //static import to avoid duplicating variables and make the code easier to read
 import static ca.mcgill.ecse211.lab2.Resources.*;
@@ -54,6 +53,18 @@ public class Display implements Runnable {
    */
   public void setTimeout(long timeout) {
     this.timeout = timeout;
+  }
+  
+  /**
+   * Shows the text on the LCD, line by line.
+   * 
+   * @param strings comma-separated list of strings, one per line
+   */
+  public static void showText(String... strings) {
+    LCD.clear();
+    for (int i = 0; i < strings.length; i++) {
+      LCD.drawString(strings[i], 0, i);
+    }
   }
 
 }

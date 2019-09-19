@@ -17,68 +17,74 @@ public class Main {
    * @param args
    */
   public static void main(String[] args) {
-
     int buttonChoice;
-
-    // Odometer related objects
-    OdometryCorrection odoCorrection = new OdometryCorrection(); // TODO Complete implementation
-    Display display = new Display(); // No need to change
-
-    do {
-      LCD.clear();
-
-      // ask the user whether the motors should drive in a square or float
-      LCD.drawString("< Left | Right >", 0, 0);
-      LCD.drawString("       |        ", 0, 1);
-      LCD.drawString(" Float | Drive  ", 0, 2);
-      LCD.drawString("motors | in a   ", 0, 3);
-      LCD.drawString("       | square ", 0, 4);
-
-      buttonChoice = Button.waitForAnyPress(); // left or right press
-    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
+    new Thread(odometer).start(); // TODO implement Odometer
+    
+    buttonChoice = chooseDriveInSquareOrFloatMotors();
 
     if (buttonChoice == Button.ID_LEFT) {
-      // Float the motors
-      leftMotor.forward();
-      leftMotor.flt();
-      rightMotor.forward();
-      rightMotor.flt();
-
-      // Display changes in position as wheels are (manually) moved
-      new Thread(odometer).start();
-      new Thread(display).start();
-
+      floatMotors();
     } else {
-      LCD.clear();
-
-      // ask the user whether odometry correction should be run or not
-      LCD.drawString("< Left | Right >", 0, 0);
-      LCD.drawString("  No   | with   ", 0, 1);
-      LCD.drawString(" corr- | corr-  ", 0, 2);
-      LCD.drawString(" ection| ection ", 0, 3);
-      LCD.drawString("       |        ", 0, 4);
-
-      buttonChoice = Button.waitForAnyPress();
-
-      new Thread(odometer).start();
-      new Thread(display).start();
-
+      buttonChoice = chooseCorrectionOrNot();
       if (buttonChoice == Button.ID_RIGHT) {
-        new Thread(odoCorrection).start();
+        new Thread(new OdometryCorrection()).start(); // TODO implement OdometryCorrection
       }
-
-      // spawn a new Thread to avoid SquareDriver.drive() from blocking
-      (new Thread() {
-        public void run() {
-          SquareDriver.drive();
-        }
-      }).start();
+      SquareDriver.drive();
     }
-
-    while (Button.waitForAnyPress() != Button.ID_ESCAPE)
-      ; // do nothing
+    
+    new Thread(new Display()).start();
+    while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
+    } // do nothing
     
     System.exit(0);
+  }
+
+  /**
+   * Floats the motors.
+   */
+  public static void floatMotors() {
+    leftMotor.forward();
+    leftMotor.flt();
+    rightMotor.forward();
+    rightMotor.flt();
+  }
+
+  /**
+   * Asks the user whether the motors should drive in a square or float.
+   * 
+   * @return the user choice
+   */
+  private static int chooseDriveInSquareOrFloatMotors() {
+    int buttonChoice;
+    Display.showText("< Left | Right >",
+                     "       |        ",
+                     " Float | Drive  ",
+                     "motors | in a   ",
+                     "       | square ");
+    
+    do {
+      buttonChoice = Button.waitForAnyPress(); // left or right press
+    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
+    return buttonChoice;
+  }
+  
+  /**
+   * Asks the user whether odometry correction should be run or not.
+   * 
+   * @return the user choice
+   */
+  private static int chooseCorrectionOrNot() {
+    int buttonChoice;
+    Display.showText("< Left | Right >",
+                     "  No   | with   ",
+                     " corr- | corr-  ",
+                     " ection| ection ",
+                     "       |        ");
+
+    do {
+      buttonChoice = Button.waitForAnyPress();
+    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
+    return buttonChoice;
   }
   
   /**

@@ -3,6 +3,8 @@ package ca.mcgill.ecse211.lab2;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
 
 /**
  * This class is used to define static resources in one place for easy access and to avoid 
@@ -33,6 +35,16 @@ public class Resources {
   public static final int ROTATE_SPEED = 150;
   
   /**
+   * The motor acceleration in degrees per second squared.
+   */
+  public static final int ACCELERATION = 3000;
+  
+  /**
+   * Timeout period in milliseconds.
+   */
+  public static final int TIMEOUT_PERIOD = 3000;
+  
+  /**
    * The tile size in centimeters.
    */
   public static final double TILE_SIZE = 30.48;
@@ -48,6 +60,11 @@ public class Resources {
    */
   public static final EV3LargeRegulatedMotor rightMotor =
       new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+  
+  /**
+   * The color sensor.
+   */
+  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
 
   /**
    * The LCD.
