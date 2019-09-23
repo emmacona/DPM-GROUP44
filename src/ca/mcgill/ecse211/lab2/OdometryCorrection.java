@@ -19,8 +19,7 @@ public class OdometryCorrection implements Runnable {
 	private Odometer odometer;
 
 	// set up sensor
-	private static Port sensorPort = LocalEV3.get().getPort("S1"); // 1. Get port 
-	//private static SensorModes colorSensor;// 2. Get sensor instance 
+	private static Port sensorPort = LocalEV3.get().getPort("S1"); // 1. Get port
 	private static SampleProvider colorSampleProvider;// 3. Get sample provider 
 	private static float[] sampleTouch;  // 4. Create data buffer
 
@@ -30,10 +29,6 @@ public class OdometryCorrection implements Runnable {
 	// Constructor
 	public OdometryCorrection() {
 		odometer = Odometer.getOdometer();
-		//sensorPort = LocalEV3.get().getPort("S1");
-		//sensorPort = SensorPort.S4;
-		//colorSensor = new EV3ColorSensor(LocalEV3.get().getPort("S1"));
-		//colorSensor = new EV3ColorSensor(sensorPort);
 		colorSampleProvider = colorSensor.getMode("Red");
 		sampleTouch = new float[colorSampleProvider.sampleSize()];
 	}
