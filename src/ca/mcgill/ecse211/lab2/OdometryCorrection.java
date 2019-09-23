@@ -7,28 +7,35 @@ import java.util.ArrayList;
 import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.port.Port;
+import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
-public class OdometryCorrection extends SquareDriver implements Runnable {
+// extends SquareDriver
+public class OdometryCorrection implements Runnable {
 	private static final long CORRECTION_PERIOD = 10;
 	private static final int LINE_COUNT = 3;
 	private Odometer odometer;
 
 	// set up sensor
-	private static Port portTouch = LocalEV3.get().getPort("S1");// 1. Get port 
-	private static SensorModes mylight = new EV3ColorSensor(portTouch);// 2. Get sensor instance 
-	private static SampleProvider myColour = mylight.getMode("Red");// 3. Get sample provider 
-	private static float[] sampleTouch = new float[myColour.sampleSize()];  // 4. Create data buffer
+	private static Port sensorPort = LocalEV3.get().getPort("S1"); // 1. Get port 
+	//private static SensorModes colorSensor;// 2. Get sensor instance 
+	private static SampleProvider colorSampleProvider;// 3. Get sample provider 
+	private static float[] sampleTouch;  // 4. Create data buffer
 
 	private static int counter = 0;
 	private static ArrayList<Double> samples = new ArrayList<Double>();
 
 	// Constructor
 	public OdometryCorrection() {
-		this.odometer = Odometer.getOdometer();
-
+		odometer = Odometer.getOdometer();
+		//sensorPort = LocalEV3.get().getPort("S1");
+		//sensorPort = SensorPort.S4;
+		//colorSensor = new EV3ColorSensor(LocalEV3.get().getPort("S1"));
+		//colorSensor = new EV3ColorSensor(sensorPort);
+		colorSampleProvider = colorSensor.getMode("Red");
+		sampleTouch = new float[colorSampleProvider.sampleSize()];
 	}
 
 	/*
@@ -61,8 +68,10 @@ public class OdometryCorrection extends SquareDriver implements Runnable {
 			// TODO Update odometer with new calculated (and more accurate) values, eg:
 			//odometer.setXYT(0.3, 19.23, 5.0);
 
-			myColour.fetchSample(sampleTouch, 0);
+			colorSampleProvider.fetchSample(sampleTouch, 0);
 
+			// TODO: it beeps constantly, which means it thinks it's constantly hitting a black line
+			// if it is very near ground, it doesn't read as black, so probably just need to position sensor really low
 			if ( sampleTouch[0] <= 0.35) {
 				//we are over a black line
 				LCD.clear();
