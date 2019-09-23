@@ -65,8 +65,6 @@ public class OdometryCorrection implements Runnable {
 
 			colorSampleProvider.fetchSample(sampleTouch, 0);
 
-			// TODO: it beeps constantly, which means it thinks it's constantly hitting a black line
-			// if it is very near ground, it doesn't read as black, so probably just need to position sensor really low
 			if ( sampleTouch[0] <= 0.055) {
 				//we are over a black line
 				LCD.clear();
