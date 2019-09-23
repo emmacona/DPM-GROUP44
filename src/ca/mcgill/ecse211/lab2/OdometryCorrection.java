@@ -2,14 +2,7 @@ package ca.mcgill.ecse211.lab2;
 
 import static ca.mcgill.ecse211.lab2.Resources.*;
 
-import java.util.ArrayList;
-
 import lejos.hardware.Sound;
-import lejos.hardware.ev3.LocalEV3;
-import lejos.hardware.port.Port;
-import lejos.hardware.port.SensorPort;
-import lejos.hardware.sensor.EV3ColorSensor;
-import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 // extends SquareDriver
@@ -18,7 +11,6 @@ public class OdometryCorrection implements Runnable {
 	private Odometer odometer;
 
 	// set yAxis sensor
-	private static Port sensorPort = LocalEV3.get().getPort("S1"); // Set sensor port to S1
 	private static SampleProvider colorSampleProvider;// Set sample provider for color
 	private static float[] colorReading;  // Color reading stored
 
@@ -57,7 +49,7 @@ public class OdometryCorrection implements Runnable {
 			colorSampleProvider.fetchSample(colorReading, 0);
 			newReading = colorReading[0];
 
-			if (oldReading - newReading > 0.06) { //we are over a black line
+			if (oldReading - newReading > 0.055) { //we are over a black line
 				Sound.beep(); // make sound
 				counter ++; //increase the nb of lines by 1
 				position = odometer.getXYT(); //
@@ -66,23 +58,24 @@ public class OdometryCorrection implements Runnable {
 					if(positive) {
 						if(counter == 1) {
 							odometer.setY(TILE_SIZE);
-						} else if( counter == 2) {
+						} else if(counter == 2) {
 							odometer.setY(2 * TILE_SIZE);
-						} else if( counter == 3) {
+						} else if(counter == 3) {
 							odometer.setY(3 * TILE_SIZE);
 							counter = 0; // reset counter to 0
 							yAxis = false; // now will move from W-E so N-S == FALSE
 						}
 					}
-					else {
+					else if(positive = false){
 						if(counter == 1) {
 							odometer.setY(3 * TILE_SIZE);
-						} else if( counter == 2) {
+						} else if(counter == 2) {
 							odometer.setY(2 * TILE_SIZE);
-						} else if( counter == 3) {
+						} else if(counter == 3) {
 							odometer.setY(TILE_SIZE);
 							counter = 0; // reset counter to 0
 							yAxis = false; // now will move from W-E so N-S == FALSE
+							positive = false;
 						}	
 					}
 				}
@@ -99,7 +92,7 @@ public class OdometryCorrection implements Runnable {
 							positive = false;
 						}
 					}
-					else {
+					else if(positive = false){
 						if(counter == 1) {
 							odometer.setX(3 * TILE_SIZE);
 						} else if( counter == 2) {
