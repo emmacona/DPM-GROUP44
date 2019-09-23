@@ -15,22 +15,19 @@ import lejos.robotics.SampleProvider;
 // extends SquareDriver
 public class OdometryCorrection implements Runnable {
 	private static final long CORRECTION_PERIOD = 10;
-	private static final int LINE_COUNT = 3;
+	private static final int LINE_NB = 3;
 	private Odometer odometer;
 
 	// set up sensor
-	private static Port sensorPort = LocalEV3.get().getPort("S1"); // 1. Get port
-	private static SampleProvider colorSampleProvider;// 3. Get sample provider 
-	private static float[] sampleTouch;  // 4. Create data buffer
-
-	private static int counter = 0;
-	private static ArrayList<Double> samples = new ArrayList<Double>();
+	private static Port sensorPort = LocalEV3.get().getPort("S1"); // Set sensor port to S1
+	private static SampleProvider colorSampleProvider;// Set sample provider for color
+	private static float[] colorReading;  // Color reading stored
 
 	// Constructor
 	public OdometryCorrection() {
-		odometer = Odometer.getOdometer();
-		colorSampleProvider = colorSensor.getMode("Red");
-		sampleTouch = new float[colorSampleProvider.sampleSize()];
+		odometer = Odometer.getOdometer(); //get the odo
+		colorSampleProvider = colorSensor.getMode("Red"); // set light to red
+		colorReading = new float[colorSampleProvider.sampleSize()]; // store current color reading
 	}
 
 	/*
@@ -41,42 +38,76 @@ public class OdometryCorrection implements Runnable {
 	public void run() {
 		long correctionStart, correctionEnd;
 
-		
+
 		while (true) {
 			correctionStart = System.currentTimeMillis();
 
 			// TODO Trigger correction (When do I have information to correct?)
-			for (int i = 0; i < (LINE_COUNT) * 4; i++) {
-				if (i<(LINE_COUNT-1)) {
-					samples.add(i*TILE_SIZE);
-				} else if (i < (LINE_COUNT) * 2) {
-					samples.add((i % 3)*TILE_SIZE);
-				} else if (i < (LINE_COUNT) * 3) {
-					samples.add((LINE_COUNT - 1 - i % 3) * TILE_SIZE);
-				} else if (i < (LINE_COUNT) * 4) {
-					samples.add((LINE_COUNT - 1 - i % 3) * TILE_SIZE);
-				}
-			}
-
 			// TODO Calculate new (accurate) robot position
-
 			// TODO Update odometer with new calculated (and more accurate) values, eg:
 			//odometer.setXYT(0.3, 19.23, 5.0);
 
-			colorSampleProvider.fetchSample(sampleTouch, 0);
+			int counter = 0; // Count number of lines
+			double[] position = new double[3]; // Store position
+			boolean up = true; // Moving along north southaxis
+			boolean position_sign = true; // If position in positive or negative
 
-			if ( sampleTouch[0] <= 0.055) {
-				//we are over a black line
-				LCD.clear();
-				//System.out.println(sampleTouch[0]);
+			colorSampleProvider.fetchSample(colorReading, 0);
 
-				Sound.beep();
-				if (counter < (LINE_COUNT) || (counter >= (LINE_COUNT)*2 && counter < (LINE_COUNT)*3)) {
-					odometer.setY(samples.get(counter));
-				} else {
-					odometer.setX(samples.get(counter));
+			if (colorReading[0] <= 0.055) { //we are over a black line
+				Sound.beep(); // make sound
+				counter ++; //increase the nb of lines by 1
+				position = odometer.getXYT(); //
+
+				if(up) {
+					if(position_sign) {
+						if(counter == 1) {
+							odometer.setXYT(position[0], TILE_SIZE, position[2]);
+						} else if( counter == 2) {
+							odometer.setXYT(position[0], 2 * TILE_SIZE, position[2]);
+						} else if( counter == 3) {
+							odometer.setXYT(position[0], 3 * TILE_SIZE, position[2]);
+							counter = 0; // reset counter to 0
+							up = false; // now will move from W-E so N-S == FALSE
+						}
+					}
+					else {
+						if(counter == 1) {
+							odometer.setXYT(position[0], 3 * TILE_SIZE, position[2]);
+						} else if( counter == 2) {
+							odometer.setXYT(position[0], 2 * TILE_SIZE, position[2]);
+						} else if( counter == 3) {
+							odometer.setXYT(position[0], TILE_SIZE, position[2]);
+							counter = 0; // reset counter to 0
+							up = false; // now will move from W-E so N-S == FALSE
+						}	
+					}
 				}
-				counter++;
+				else {
+					if(position_sign) {
+						if(counter == 1) {
+							odometer.setXYT(TILE_SIZE, position[1], position[2]);
+						} else if( counter == 2) {
+							odometer.setXYT(2 * TILE_SIZE, position[1], position[2]);
+						} else if( counter == 3) {
+							odometer.setXYT(3 * TILE_SIZE, position[1], position[2]);
+							counter = 0; // reset counter to 0
+							up = true;
+							position_sign = false;
+						}
+					}
+					else {
+						if(counter == 1) {
+							odometer.setXYT(3 * TILE_SIZE, position[1], position[2]);
+						} else if( counter == 2) {
+							odometer.setXYT(2 * TILE_SIZE, position[1], position[2]);
+						} else if( counter == 3) {
+							odometer.setXYT(TILE_SIZE, position[1], position[2]);
+							counter = 0; // reset counter to 0
+							up = true;
+						}	
+					}
+				}
 			}
 
 			// this ensures the odometry correction occurs only once every period
