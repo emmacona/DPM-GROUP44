@@ -100,7 +100,6 @@ public class Odometer implements Runnable {
 	 * This method is where the logic for the odometer will run.
 	 * 
 	 */
-	
 	public void run() {
 		long updateStart, updateEnd;
 		double deltaD, deltaT, dX, dY;
@@ -111,12 +110,11 @@ public class Odometer implements Runnable {
 			leftMotorTachoCount = leftMotor.getTachoCount();
 			rightMotorTachoCount = rightMotor.getTachoCount();
 
-			// TODO Calculate new robot position based on tachometer counts
-			// Calculate displacements
+			// calculate displacements
 			double leftDistance = Math.PI * WHEEL_RAD * (leftMotorTachoCount - lastTachoL) / 180;
 			double rightDistance = Math.PI * WHEEL_RAD * (rightMotorTachoCount - lastTachoR) / 180;
 			
-			// Tacho counts
+			// tacho counts
 			lastTachoL = leftMotorTachoCount; 
 			lastTachoR = rightMotorTachoCount;
 			
@@ -126,19 +124,21 @@ public class Odometer implements Runnable {
 			dX = deltaD * Math.sin(Theta);
 			dY = deltaD * Math.cos(Theta); 
 			
-			deltaT = (deltaT * 180) / Math.PI; // Convert from radians to degree
+			// convert from radians to degree
+			deltaT = (deltaT * 180) / Math.PI;
 
-			// TODO Update odometer values with new calculated values, eg
-			//odo.update(dx, dy, dtheta);
+			// done calculating new values
+			// so now update odometer
 			odo.update(dX, dY, deltaT);
 
 			// this ensures that the odometer only runs once every period
 			updateEnd = System.currentTimeMillis();
 			if (updateEnd - updateStart < ODOMETER_PERIOD) {
 				try {
-					Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
+					// sleep for remaining time of odometer period
+				    Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
 				} catch (InterruptedException e) {
-					// there is nothing to be done
+					e.printStackTrace();
 				}
 			}
 		}
