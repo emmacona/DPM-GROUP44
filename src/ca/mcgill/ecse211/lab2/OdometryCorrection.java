@@ -8,7 +8,6 @@ import lejos.robotics.SampleProvider;
 // extends SquareDriver
 public class OdometryCorrection implements Runnable {
 	private static final long CORRECTION_PERIOD = 10;
-	private static final int TILE_NB = 4;
 	private Odometer odometer;
 
 	// set yAxis sensor
@@ -24,9 +23,9 @@ public class OdometryCorrection implements Runnable {
 
 	/*
 	 * Here is where the odometer correction code should be run.
+	 * Keeps track of position (x, y, theta)
+	 * If black line is detected, adjust position in relation to tile size
 	 */
-
-
 	public void run() {
 		long correctionStart, correctionEnd;
 
@@ -52,35 +51,35 @@ public class OdometryCorrection implements Runnable {
 
 			double[] position = new double[3];
 
-			colorSampleProvider.fetchSample(colorReading, 0);
-			newReading = colorReading[0];
+			colorSampleProvider.fetchSample(colorReading, 0); // fetch color reading
+			newReading = colorReading[0]; // store fetch as new reading
 
 			// should only trigger when new reading has a significantly lower intensity than old
 			// thus indicating a black line
 			if (oldReading - newReading > 0.035) {
-				Sound.beep();
+				Sound.beep(); // make sound to indicate black line was detected
 
-				position = odometer.getXYT();
+				position = odometer.getXYT(); // get position of odo
 				
 				// if pointed in positive y
-				if(position[2] < 45 || position[2] > 315) {
-					counterY++;
-					odometer.setY(counterY*TILE_SIZE);
+				if(position[2] < 45 || position[2] > 315) { // moving up
+					counterY++; //increament y counter
+					odometer.setY(counterY*TILE_SIZE); // increment y position in relation to tile size
 				}
 				// else if pointed in positive x
-				else if(position[2] < 135 && position[2] > 45) {
-					counterX++;
-					odometer.setX(counterX*TILE_SIZE);
+				else if(position[2] < 135 && position[2] > 45) { // moving to the right
+					counterX++; //increment x counter
+					odometer.setX(counterX*TILE_SIZE); // increment x position in relation to tile size
 				}
 				// else if pointed in negative y
-				else if(position[2] < 225 && position[2] > 135) {
-					odometer.setY(counterY*TILE_SIZE);
-					counterY--;
+				else if(position[2] < 225 && position[2] > 135) { // moving down
+					odometer.setY(counterY*TILE_SIZE); // decrement y position in relation to tile size
+					counterY--; // this counter handles decrease in y
 				}
 				// else if pointed in negative x
-				else if(position[2] < 315 && position[2] > 225) {
-					odometer.setX(counterX*TILE_SIZE);
-					counterX--;
+				else if(position[2] < 315 && position[2] > 225) { // moving right to left
+					odometer.setX(counterX*TILE_SIZE); // decrement x position in relation to tile size
+					counterX--; // this counter handles decrease in x
 				}
 				
 				// if detect a black line, prevent from double counting line
@@ -94,8 +93,7 @@ public class OdometryCorrection implements Runnable {
 			
 			// after doing all the logic of the loop, update oldReading for the next iteration to use
 			oldReading = newReading;
-
-			// TODO: is this part redundant?
+			
 			// this ensures the odometry correction occurs only once every period
 			correctionEnd = System.currentTimeMillis();
 			if (correctionEnd - correctionStart < CORRECTION_PERIOD) {
@@ -103,5 +101,4 @@ public class OdometryCorrection implements Runnable {
 			}
 		}
 	}
-
 }
