@@ -8,6 +8,7 @@ import lejos.robotics.SampleProvider;
 // extends SquareDriver
 public class OdometryCorrection implements Runnable {
 	private static final long CORRECTION_PERIOD = 10;
+	private static final int TILE_NB = 4;
 	private Odometer odometer;
 
 	// set yAxis sensor
@@ -31,7 +32,10 @@ public class OdometryCorrection implements Runnable {
 
 		colorSampleProvider.fetchSample(colorReading, 0);
 		double oldReading = colorReading[0];
-		double newReading;
+		double newReading;	
+		int stage = 0;
+		int counterY = 0; // Count number of lines
+		int counterX = 0; // Count number of lines
 
 		while (true) {
 			correctionStart = System.currentTimeMillis();
@@ -41,68 +45,32 @@ public class OdometryCorrection implements Runnable {
 			// TODO yAxisdate odometer with new calculated (and more accurate) values, eg:
 			//odometer.setXYT(0.3, 19.23, 5.0);
 
-			int counter = 0; // Count number of lines
 			double[] position = new double[3]; // Store position
 			boolean yAxis = true; // Moving along north south axis
-			boolean positive = true; // If position in positive or negative
+			//			boolean positive = true; // If position in positive or negative
 
 			colorSampleProvider.fetchSample(colorReading, 0);
 			newReading = colorReading[0];
 
-			if (oldReading - newReading > 0.055) { //we are over a black line
+			if (oldReading - newReading > 0.035) { //we are over a black line
 				Sound.beep(); // make sound
-				counter ++; //increase the nb of lines by 1
-				position = odometer.getXYT(); //
 
-				if(yAxis) {
-					if(positive) {
-						if(counter == 1) {
-							odometer.setY(TILE_SIZE);
-						} else if(counter == 2) {
-							odometer.setY(2 * TILE_SIZE);
-						} else if(counter == 3) {
-							odometer.setY(3 * TILE_SIZE);
-							counter = 0; // reset counter to 0
-							yAxis = false; // now will move from W-E so N-S == FALSE
-						}
-					}
-					else if(positive = false){
-						if(counter == 1) {
-							odometer.setY(3 * TILE_SIZE);
-						} else if(counter == 2) {
-							odometer.setY(2 * TILE_SIZE);
-						} else if(counter == 3) {
-							odometer.setY(TILE_SIZE);
-							counter = 0; // reset counter to 0
-							yAxis = false; // now will move from W-E so N-S == FALSE
-							positive = false;
-						}	
-					}
+				position = odometer.getXYT(); //
+				if(position[2] < 45 || position[2] > 315) {
+					counterY++;
+					odometer.setY(counterY*TILE_SIZE);
+				} 
+				else if(position[2] < 135 && position[2] > 45) {
+					counterX++;
+					odometer.setX(counterX*TILE_SIZE);
+				} 
+				else if(position[2] < 225 && position[2] > 135) {
+					odometer.setY(counterY*TILE_SIZE);
+					counterY--;
 				}
-				else {
-					if(positive) {
-						if(counter == 1) {
-							odometer.setX(TILE_SIZE);
-						} else if( counter == 2) {
-							odometer.setX(2 * TILE_SIZE);
-						} else if( counter == 3) {
-							odometer.setX(3 * TILE_SIZE);
-							counter = 0; // reset counter to 0
-							yAxis = true;
-							positive = false;
-						}
-					}
-					else if(positive = false){
-						if(counter == 1) {
-							odometer.setX(3 * TILE_SIZE);
-						} else if( counter == 2) {
-							odometer.setX(2 * TILE_SIZE);
-						} else if( counter == 3) {
-							odometer.setX(TILE_SIZE);
-							counter = 0; // reset counter to 0
-							yAxis = true;
-						}	
-					}
+				else if(position[2] < 315 && position[2] > 225) {
+					odometer.setX(counterX*TILE_SIZE);
+					counterX--;
 				}
 				try {
 					Thread.sleep(500);
@@ -111,8 +79,69 @@ public class OdometryCorrection implements Runnable {
 					e.printStackTrace();
 				}
 			}
-			
 			oldReading = newReading;
+
+
+
+			//				if(yAxis) {
+			//					if(positive) {
+			//						if(counter == 1) {
+			//							odometer.setY(TILE_SIZE);
+			//						} else if(counter == 2) {
+			//							odometer.setY(2 * TILE_SIZE);
+			//						} else if(counter == 3) {
+			//							odometer.setY(3 * TILE_SIZE);
+			//							counter = 0; // reset counter to 0
+			//							yAxis = false; // now will move from W-E so N-S == FALSE
+			//						}
+			//					}
+			//					else if(positive = false){
+			//						if(counter == 1) {
+			//							odometer.setY(3 * TILE_SIZE);
+			//						} else if(counter == 2) {
+			//							odometer.setY(2 * TILE_SIZE);
+			//						} else if(counter == 3) {
+			//							odometer.setY(TILE_SIZE);
+			//							counter = 0; // reset counter to 0
+			//							yAxis = false; // now will move from W-E so N-S == FALSE
+			//							positive = false;
+			//						}	
+			//					}
+			//				}
+			//				else { //on x axis
+			//					if(positive) {
+			//						if(counter == 1) {
+			//							odometer.setX(TILE_SIZE);
+			//						} else if( counter == 2) {
+			//							odometer.setX(2 * TILE_SIZE);
+			//						} else if( counter == 3) {
+			//							odometer.setX(3 * TILE_SIZE);
+			//							counter = 0; // reset counter to 0
+			//							yAxis = true;
+			//							positive = false;
+			//						}
+			//					}
+			//					else if(positive = false){
+			//						if(counter == 1) {
+			//							odometer.setX(3 * TILE_SIZE);
+			//						} else if( counter == 2) {
+			//							odometer.setX(2 * TILE_SIZE);
+			//						} else if( counter == 3) {
+			//							odometer.setX(TILE_SIZE);
+			//							counter = 0; // reset counter to 0
+			//							yAxis = true;
+			//						}	
+			//					}
+			//				}
+			//				try {
+			//					Thread.sleep(500);
+			//				} catch (InterruptedException e) {
+			//					// TODO Auto-generated catch block
+			//					e.printStackTrace();
+			//				}
+			//			}
+			//
+			//			oldReading = newReading;
 
 
 			// this ensures the odometry correction occurs only once every period
