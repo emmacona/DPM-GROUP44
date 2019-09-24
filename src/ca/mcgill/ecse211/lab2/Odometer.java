@@ -98,8 +98,10 @@ public class Odometer implements Runnable {
 
 	/**
 	 * This method is where the logic for the odometer will run.
-	 * 
+	 * This method counts the number of times each will has turned and updates the position accordingly.
+	 * (for x, y, and theta)
 	 */
+	
 	public void run() {
 		long updateStart, updateEnd;
 		double deltaD, deltaT, dX, dY;
@@ -107,38 +109,36 @@ public class Odometer implements Runnable {
 		while (true) {
 			updateStart = System.currentTimeMillis();
 
-			leftMotorTachoCount = leftMotor.getTachoCount();
-			rightMotorTachoCount = rightMotor.getTachoCount();
+			leftMotorTachoCount = leftMotor.getTachoCount(); // get current tacho counts
+			rightMotorTachoCount = rightMotor.getTachoCount(); 
 
-			// calculate displacements
+			// Calculate displacements
 			double leftDistance = Math.PI * WHEEL_RAD * (leftMotorTachoCount - lastTachoL) / 180;
 			double rightDistance = Math.PI * WHEEL_RAD * (rightMotorTachoCount - lastTachoR) / 180;
 			
-			// tacho counts
+			// Update tacho counts
 			lastTachoL = leftMotorTachoCount; 
 			lastTachoR = rightMotorTachoCount;
 			
-			deltaD = 0.5*(leftDistance + rightDistance); 
-			deltaT = (leftDistance - rightDistance)/TRACK; 
-			Theta += deltaT;
-			dX = deltaD * Math.sin(Theta);
-			dY = deltaD * Math.cos(Theta); 
+			// Calculate differences
+			deltaD = 0.5*(leftDistance + rightDistance);  //change in distance
+			deltaT = (leftDistance - rightDistance)/TRACK; // change in tetha
+			Theta += deltaT; // update theta
+			dX = deltaD * Math.sin(Theta); // calculate displacement in x
+			dY = deltaD * Math.cos(Theta); // calculate displacement in y
 			
-			// convert from radians to degree
-			deltaT = (deltaT * 180) / Math.PI;
+			deltaT = (deltaT * 180) / Math.PI; // Convert from radians to degree
 
-			// done calculating new values
-			// so now update odometer
+			//Update odometer values with new calculated values
 			odo.update(dX, dY, deltaT);
 
 			// this ensures that the odometer only runs once every period
 			updateEnd = System.currentTimeMillis();
 			if (updateEnd - updateStart < ODOMETER_PERIOD) {
 				try {
-					// sleep for remaining time of odometer period
-				    Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
+					Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					// there is nothing to be done
 				}
 			}
 		}
