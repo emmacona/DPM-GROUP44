@@ -55,7 +55,7 @@ public class Main {
 
     for (int[] point : waypoints) {
       Navigation.travelTo(point[0], point[1], true);
-      while (ObstacleAvoidance.traveling) {
+      while (ObstacleAvoidance.isNavigating) {
         Main.sleepFor(500);
       }
     }

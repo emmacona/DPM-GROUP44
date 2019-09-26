@@ -19,6 +19,8 @@ import static ca.mcgill.ecse211.lab3.Resources.*;
 //static imports to avoid duplicating variables and make the code easier to read
 import static java.lang.Math.*;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 /**
  * Class that offers static methods used for navigation.
  */
@@ -85,7 +87,7 @@ public class Navigation {
       ObstacleAvoidance.desty = y;
       
       // This will trigger the state machine running in the obstacleAvoidance thread
-      ObstacleAvoidance.traveling = true; 
+      ObstacleAvoidance.isNavigating = true; 
     } else {
       Navigation.travelTo(x, y);
     }
@@ -121,7 +123,12 @@ public class Navigation {
    * @return the destination angle.
    */
   public static double getDestAngle(double x, double y) {
-    double minAng = (atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / PI);
+	  // atan2(sin(x-y), cos(x-y))
+	  // x is the target angle. y is the source or starting angle
+	  
+	  //TODO figure out min angle
+    
+	  double minAng = (atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / PI);
     if (minAng < 0) {
       minAng += 360.0;
     }

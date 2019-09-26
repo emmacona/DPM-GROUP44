@@ -27,7 +27,7 @@ public class ObstacleAvoidance implements Runnable {
   /**
    * {@code true} when robot is traveling.
    */
-  public static boolean traveling; // booleans are false by default
+  public static boolean isNavigating = false; // boolean false by default
   
   /**
    * {@code true} when obstacle is avoided.
@@ -49,6 +49,11 @@ public class ObstacleAvoidance implements Runnable {
    */
   public static final int SLEEP_TIME = 50;
   
+  /**
+   * The distance when is in emergency state. in cm
+   */
+  private static final int TOO_CLOSE = 10;
+  
   
   /**
    * Updates the heading.
@@ -59,10 +64,13 @@ public class ObstacleAvoidance implements Runnable {
   }
 
   public void run() {
+	  
+	  //TODO rethink this part
+	  
     state = INIT;
     while (true) {
       if (state == INIT) {
-        if (traveling) {
+        if (isNavigating()) {
           state = TURNING;
         }
       } else if (state == TURNING) {
@@ -89,7 +97,7 @@ public class ObstacleAvoidance implements Runnable {
           updateTravel();
         } else { // Arrived!
           Navigation.setSpeeds(0, 0);
-          traveling = false;
+          isNavigating = false;
           state = INIT;
         }
       } else if (state == EMERGENCY) {
@@ -106,9 +114,17 @@ public class ObstacleAvoidance implements Runnable {
    * Sets emergency state when robot is too close to a wall.
    */
   public static void checkEmergency() {
-    if (usPoller.getDistance() < 10) {
+    if (usPoller.getDistance() < TOO_CLOSE) {
       state = EMERGENCY;
     }
+  }
+  
+  /**
+   * This method returns true if another thread has called travelTo() or turnTo() and the method has yet to return; 
+   * false otherwise.
+   */
+  public static boolean isNavigating() {
+    return isNavigating;
   }
 
 }

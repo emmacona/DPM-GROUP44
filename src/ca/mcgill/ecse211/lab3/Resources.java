@@ -24,17 +24,17 @@ public class Resources {
   /**
    * The robot width.
    */
-  public static final double TRACK = 15;
+  public static final double TRACK = 12.25;
   
   /**
    * The left radius.
    */
-  public static final double LEFT_RADIUS = 2.75;
+  public static final double LEFT_RADIUS = 2.130;
   
   /**
    * The right radius.
    */
-  public static final double RIGHT_RADIUS = 2.75;
+  public static final double RIGHT_RADIUS = 2.130;
   
   /**
    * The width.
@@ -84,12 +84,12 @@ public class Resources {
   /**
    * The ultrasonic sensor.
    */
-  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
+  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
   
   /**
    * The color sensor.
    */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S4);
+  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
   
   /**
    * The LCD.
