@@ -1,98 +1,64 @@
-// Lab2.java
 package ca.mcgill.ecse211.lab3;
 
+import static ca.mcgill.ecse211.lab3.Resources.*;
+import java.io.FileNotFoundException;
 import lejos.hardware.Button;
 
-// static import to avoid duplicating variables and make the code easier to read
-import static ca.mcgill.ecse211.lab3.Resources.*;
-
 /**
- * The main driver class for the odometry lab.
+ * The main class.
  */
 public class Main {
-
-  // TODO: change main method
-  // TODO: remove SquareDriver
-  // TODO: add ultrasonic sensor
-  // TODO: create class(es) to handle ultrasonic controller readings
-  // TODO: see if still need odo correction; if so, modify to work with angles
-  // TODO: fill out Navigation
-  // TODO: javadoc for everything
   
   /**
-   * The main entry point.
+   * Set this to true to print to a file.
+   */
+  public static final boolean WRITE_TO_FILE = false;
+
+  /**
+   * Main entry point.
    * 
    * @param args
    */
   public static void main(String[] args) {
-    int buttonChoice;
-    new Thread(odometer).start();
-    
-    buttonChoice = chooseDriveInSquareOrFloatMotors();
 
-    if (buttonChoice == Button.ID_LEFT) {
-      floatMotors();
-    } else {
-      buttonChoice = chooseCorrectionOrNot();
-      if (buttonChoice == Button.ID_RIGHT) {
-        new Thread(new OdometryCorrection()).start();
-      }
-      // SquareDriver.drive();
+    Log.setLogging(true, true, false, true);
+
+    if (WRITE_TO_FILE) {
+      setupLogWriter();
     }
     
-    new Thread(new Display()).start();
-    while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
-    } // do nothing
+    new Thread(usPoller).start();
+    new Thread(odometer).start();
+    new Thread(obstacleAvoidance).start();
+
+    completeCourse();
+
+    while (Button.waitForAnyPress() != Button.ID_ESCAPE)
+      ; // do nothing
     
     System.exit(0);
   }
 
-  /**
-   * Floats the motors.
-   */
-  public static void floatMotors() {
-    leftMotor.forward();
-    leftMotor.flt();
-    rightMotor.forward();
-    rightMotor.flt();
+  public static void setupLogWriter() {
+    try {
+      Log.setLogWriter(System.currentTimeMillis() + ".log");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
-   * Asks the user whether the motors should drive in a square or float.
-   * 
-   * @return the user choice
+   * Completes a course.
    */
-  private static int chooseDriveInSquareOrFloatMotors() {
-    int buttonChoice;
-    Display.showText("< Left | Right >",
-                     "       |        ",
-                     " Float | Drive  ",
-                     "motors | in a   ",
-                     "       | square ");
-    
-    do {
-      buttonChoice = Button.waitForAnyPress(); // left or right press
-    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
-    return buttonChoice;
-  }
-  
-  /**
-   * Asks the user whether odometry correction should be run or not.
-   * 
-   * @return the user choice
-   */
-  private static int chooseCorrectionOrNot() {
-    int buttonChoice;
-    Display.showText("< Left | Right >",
-                     "  No   | with   ",
-                     " corr- | corr-  ",
-                     " ection| ection ",
-                     "       |        ");
+  private static void completeCourse() {
+    int[][] waypoints = {{60, 30}, {30, 30}, {30, 60}, {60, 0}};
 
-    do {
-      buttonChoice = Button.waitForAnyPress();
-    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
-    return buttonChoice;
+    for (int[] point : waypoints) {
+      Navigation.travelTo(point[0], point[1], true);
+      while (ObstacleAvoidance.traveling) {
+        Main.sleepFor(500);
+      }
+    }
   }
   
   /**

@@ -3,8 +3,10 @@ package ca.mcgill.ecse211.lab3;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 /**
  * This class is used to define static resources in one place for easy access and to avoid 
@@ -13,67 +15,100 @@ import lejos.hardware.sensor.EV3ColorSensor;
  * <p>{@code import static ca.mcgill.ecse211.lab3.Resources.*;}
  */
 public class Resources {
+
+  /**
+   * The wheel radius.
+   */
+  public static final double WHEEL_RADIUS = 2.130;
   
   /**
-   * The wheel radius in centimeters.
+   * The robot width.
    */
-  public static final double WHEEL_RAD = 2.130;
+  public static final double TRACK = 15;
   
   /**
-   * The robot width in centimeters.
+   * The left radius.
    */
-  public static final double TRACK = 12.25;
+  public static final double LEFT_RADIUS = 2.75;
   
   /**
-   * The speed at which the robot moves forward in degrees per second.
+   * The right radius.
    */
-  public static final int FORWARD_SPEED = 250;
+  public static final double RIGHT_RADIUS = 2.75;
   
   /**
-   * The speed at which the robot rotates in degrees per second.
+   * The width.
    */
-  public static final int ROTATE_SPEED = 150;
+  public static final double WIDTH = 15.8;
   
   /**
-   * The motor acceleration in degrees per second squared.
+   * The odometer timeout period.
    */
-  public static final int ACCELERATION = 3000;
+  public static final int TIMEOUT_PERIOD = 50;
   
   /**
-   * Timeout period in milliseconds.
+   * The fast speed.
    */
-  public static final int TIMEOUT_PERIOD = 3000;
+  public static final int FAST = 200;
   
   /**
-   * The tile size in centimeters.
+   * The slow speed.
    */
-  public static final double TILE_SIZE = 30.48;
+  public static final int SLOW = 100;
+  
+  /**
+   * The acceleration.
+   */
+  public static final int ACCELERATION = 4000;
+  
+  /**
+   * The degree error.
+   */
+  public static final double DEG_ERR = 3.0;
+  
+  /**
+   * The cm error.
+   */
+  public static final double CM_ERR = 1.0;
   
   /**
    * The left motor.
    */
-  public static final EV3LargeRegulatedMotor leftMotor =
-      new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-
+  public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
+  
   /**
    * The right motor.
    */
-  public static final EV3LargeRegulatedMotor rightMotor =
-      new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+  public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
+  
+  /**
+   * The ultrasonic sensor.
+   */
+  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
   
   /**
    * The color sensor.
    */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
-
+  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S4);
+  
   /**
    * The LCD.
    */
   public static final TextLCD LCD = LocalEV3.get().getTextLCD();
   
   /**
+   * The ultrasonic poller.
+   */
+  public static UltrasonicPoller usPoller = new UltrasonicPoller();
+  
+  /**
    * The odometer.
    */
-  public static Odometer odometer = Odometer.getOdometer();
+  public static Odometer odometer = new Odometer();
   
+  /**
+   * The obstacle avoidance.
+   */
+  public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+
 }
