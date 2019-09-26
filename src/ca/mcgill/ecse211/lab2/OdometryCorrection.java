@@ -5,12 +5,11 @@ import static ca.mcgill.ecse211.lab2.Resources.*;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
-// extends SquareDriver
 public class OdometryCorrection implements Runnable {
 	private static final long CORRECTION_PERIOD = 10;
 	private Odometer odometer;
 
-	// set yAxis sensor
+	// set color sensor
 	private static SampleProvider colorSampleProvider;// Set sample provider for color
 	private static float[] colorReading;  // Color reading stored
 
@@ -21,7 +20,7 @@ public class OdometryCorrection implements Runnable {
 		colorReading = new float[colorSampleProvider.sampleSize()]; // store current color reading
 	}
 
-	/*
+	/**
 	 * Here is where the odometer correction code should be run.
 	 * Keeps track of position (x, y, theta)
 	 * If black line is detected, adjust position in relation to tile size
