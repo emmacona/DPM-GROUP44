@@ -5,6 +5,7 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 /**
  * This class is used to define static resources in one place for easy access and to avoid 
@@ -25,9 +26,25 @@ public class Resources {
   public static final double TRACK = 12.25;
   
   /**
+   * The degree error.
+   */
+  public static final double DEG_ERR = 3.0;
+  
+  /**
+   * The cm error.
+   */
+  public static final double CM_ERR = 1.0;
+  
+  /**
    * The speed at which the robot moves forward in degrees per second.
    */
-  public static final int FORWARD_SPEED = 250;
+  public static final int FORWARD_SPEED = 200;
+  
+  /**
+   * The speed at which the robot moves forward in degrees per second.
+   * SLOW speed
+   */
+  public static final int SLOW_SPEED = 100;
   
   /**
    * The speed at which the robot rotates in degrees per second.
@@ -37,7 +54,7 @@ public class Resources {
   /**
    * The motor acceleration in degrees per second squared.
    */
-  public static final int ACCELERATION = 3000;
+  public static final int ACCELERATION = 500;
   
   /**
    * Timeout period in milliseconds.
@@ -65,6 +82,12 @@ public class Resources {
    * The color sensor.
    */
   public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+  
+  /**
+   * The ultrasonic sensor.
+   */
+  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
+  
 
   /**
    * The LCD.
@@ -75,5 +98,16 @@ public class Resources {
    * The odometer.
    */
   public static Odometer odometer = Odometer.getOdometer();
+  
+  /**
+   * The ultrasonic poller.
+   */
+  public static UltrasonicPoller usPoller = new UltrasonicPoller();
+  
+  /**
+   * The obstacle avoidance.
+   */
+  public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+  
   
 }

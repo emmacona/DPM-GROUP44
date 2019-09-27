@@ -270,4 +270,28 @@ public class Odometer implements Runnable {
 		}
 	}
 
+	/**
+	 * get X
+	 * @return x
+	 */
+	public double getX() {
+		return getXYT()[0];
+	}
+	
+	/**
+	 * get Y
+	 * @return y
+	 */
+	public double getY() {
+		return getXYT()[1];
+	}
+	
+	/**
+	 * get Theta
+	 * @return theta
+	 */
+	public double getT() {
+		return getXYT()[2];
+	}
+
 }
