@@ -2,8 +2,10 @@ package ca.mcgill.ecse211.lab3;
 
 import java.text.DecimalFormat;
 
+import lejos.hardware.lcd.LCD;
+
 //static import to avoid duplicating variables and make the code easier to read
-import static ca.mcgill.ecse211.lab2.Resources.*;
+import static ca.mcgill.ecse211.lab3.Resources.*;
 
 /**
  * This class is used to display the content of the odometer variables (x, y, Theta)
@@ -25,7 +27,7 @@ public class Display implements Runnable {
       updateStart = System.currentTimeMillis();
 
       // Retrieve x, y and Theta information
-      position = odometer.getXYT();
+      position = odometer.getPosition();
       
       // Print x,y, and theta information
       DecimalFormat numberFormat = new DecimalFormat("######0.00");

@@ -24,7 +24,7 @@ public class Resources {
 	/**
 	 * The wheel radius.
 	 */
-	public static final double WHEEL_RAD = 2.130;
+	public static final double WHEEL_RADIUS = 2.130;
 
 	/**
 	 * The robot width.
@@ -32,20 +32,14 @@ public class Resources {
 	public static final double TRACK = 12.25;
 
 	/**
-	 * The speed at which the robot moves forward in degrees per second.
+	 * The left radius.
 	 */
-	public static final int FORWARD_SPEED = 200;
+	public static final double LEFT_RADIUS = 2.75;
 
 	/**
-	 * The speed at which the robot moves forward in degrees per second.
-	 * SLOW speed
+	 * The right radius.
 	 */
-	public static final int SLOW_SPEED = 100;
-
-	/**
-	 * The rotate speed.
-	 */
-	public static final int ROTATE_SPEED = 150;
+	public static final double RIGHT_RADIUS = 2.75;
 
 	/**
 	 * The width.
@@ -57,12 +51,20 @@ public class Resources {
 	 */
 	public static final int TIMEOUT_PERIOD = 50;
 
+	/**
+	 * The fast speed.
+	 */
+	public static final int FAST = 200;
+
+	/**
+	 * The slow speed.
+	 */
+	public static final int SLOW = 100;
 
 	/**
 	 * The acceleration.
 	 */
-	public static final int ACCELERATION = 500;
-
+	public static final int ACCELERATION = 4000;
 
 	/**
 	 * The degree error.
@@ -113,10 +115,9 @@ public class Resources {
 	 * The obstacle avoidance.
 	 */
 	public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
-	
-	/**
 
-	 * The navigation.
+	/**
+	 * The navigator.
 	 */
 	public static Navigation navigation = new Navigation();
 

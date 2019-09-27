@@ -1,8 +1,6 @@
 package ca.mcgill.ecse211.lab3;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
-
-import ca.mcgill.ecse211.lab1.PController;
+import static ca.mcgill.ecse211.lab3.Resources.*;
 
 /**
  * Samples the US sensor and invokes the selected controller on each cycle.
@@ -14,32 +12,25 @@ import ca.mcgill.ecse211.lab1.PController;
  * or about 14 Hz.
  */
 public class UltrasonicPoller implements Runnable {
+  private float[] usData = new float[usSensor.sampleSize()];
+  int distance;
 
-  private PController controller;
-  private float[] usData;
+  // Sensors now return floats using a uniform protocol.
+  // Need to convert US result to an integer [0,255]
 
-  public UltrasonicPoller() {
-    usData = new float[US_SENSOR.sampleSize()];
-    controller = new PController();
+  public void run() {
+    while (true) {
+      usSensor.fetchSample(usData, 0); // acquire data
+      distance = (int) (usData[0] * 100.0); // extract from buffer, convert to cm, cast to int
+
+      Log.log(Log.Sender.usSensor, Integer.toString(distance));
+
+      Main.sleepFor(50);
+    }
   }
 
-  /*
-   * Sensors now return floats using a uniform protocol. Need to convert US result to an integer
-   * [0,255] (non-Javadoc)
-   * 
-   * @see java.lang.Thread#run()
-   */
-  public void run() {
-    int distance;
-    while (true) {
-      US_SENSOR.getDistanceMode().fetchSample(usData, 0); // acquire distance data in meters
-      distance = (int) (usData[0] * 100.0); // extract from buffer, convert to cm, cast to int
-      controller.processUSData(distance); // now take action depending on value
-      try {
-        Thread.sleep(50);
-      } catch (Exception e) {
-      } // Poor man's timed sampling
-    }
+  public int getDistance() {
+    return distance;
   }
 
 }
