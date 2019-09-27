@@ -1,6 +1,135 @@
 package ca.mcgill.ecse211.lab3;
 
+<<<<<<< HEAD
 import static ca.mcgill.ecse211.lab3.Resources.odometer;
+=======
+//static imports to avoid duplicating variables and make the code easier to read
+import static ca.mcgill.ecse211.lab3.Resources.*;
+import static ca.mcgill.ecse211.lab3.ObstacleAvoidance.State.*;
+
+/**
+ * Avoids obstacles. Implemented using a state machine.
+ */
+public class ObstacleAvoidance implements Runnable {
+
+  /**
+   * The possible states that the robot could be in.
+   */
+  enum State {
+    /** The initial state. */ INIT,
+    /** The turning state. */ TURNING, 
+    /** The traveling state. */ TRAVELING,
+    /** The emergency state. */ EMERGENCY
+  };
+
+  /**
+   * The current state of the robot.
+   */
+  static State state;
+
+  /**
+   * {@code true} when robot is traveling.
+   */
+  public static boolean isNavigating = false; // boolean false by default
+  
+  /**
+   * {@code true} when obstacle is avoided.
+   */
+  public static boolean safe;
+
+  /**
+   * The destination x.
+   */
+  public static double destx;
+  
+  /**
+   * The destination y.
+   */
+  public static double desty;
+
+  /**
+   * The sleep time.
+   */
+  public static final int SLEEP_TIME = 50;
+  
+  /**
+   * The distance when is in emergency state. in cm
+   */
+  private static final int TOO_CLOSE = 10;
+  
+  
+  /**
+   * Updates the heading.
+   */
+  public static void updateTravel() {
+    Navigation.turnTo(Navigation.getDestAngle(destx, desty), false);
+    Navigation.setSpeeds(FAST, FAST);
+  }
+
+  public void run() {
+	  
+	  //TODO rethink this part
+	  
+    state = INIT;
+    while (true) {
+      if (state == INIT) {
+        if (isNavigating()) {
+          state = TURNING;
+        }
+      } else if (state == TURNING) {
+        double destAngle = Navigation.getDestAngle(destx, desty);
+        Navigation.turnTo(destAngle, true);
+        if (Navigation.facingDest(destAngle)) {
+          Navigation.setSpeeds(0, 0);
+          state = TRAVELING;
+        }
+      } else if (state == TRAVELING) {
+        checkEmergency();
+        if (state == EMERGENCY) { // order matters!
+          new Thread(new Runnable() {
+            @Override public void run() {
+              Log.log(Log.Sender.avoidance,"avoiding obstacle!");
+              Navigation.setSpeeds(0, 0);
+              Navigation.turnTo(0,true);
+              Navigation.goForward(5, false);
+              Log.log(Log.Sender.avoidance,"obstacle avoided!");
+              safe = true;
+            }
+          }).start();
+        } else if (!Navigation.isDone(destx, desty)) {
+          updateTravel();
+        } else { // Arrived!
+          Navigation.setSpeeds(0, 0);
+          isNavigating = false;
+          state = INIT;
+        }
+      } else if (state == EMERGENCY) {
+        if (safe) {
+          state = TURNING;
+        }
+      }
+      Log.log(Log.Sender.Navigator, "state: " + state);
+      Main.sleepFor(SLEEP_TIME);
+    }
+  }
+
+  /**
+   * Sets emergency state when robot is too close to a wall.
+   */
+  public static void checkEmergency() {
+    if (usPoller.getDistance() < TOO_CLOSE) {
+      state = EMERGENCY;
+    }
+  }
+  
+  /**
+   * This method returns true if another thread has called travelTo() or turnTo() and the method has yet to return; 
+   * false otherwise.
+   */
+  public static boolean isNavigating() {
+    return isNavigating;
+  }
+>>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
 
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;

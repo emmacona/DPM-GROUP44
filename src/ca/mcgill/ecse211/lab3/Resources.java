@@ -3,6 +3,7 @@ package ca.mcgill.ecse211.lab3;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
@@ -14,18 +15,19 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
  * <p>{@code import static ca.mcgill.ecse211.lab3.Resources.*;}
  */
 public class Resources {
-  
+
   /**
-   * The wheel radius in centimeters.
+   * The wheel radius.
    */
-  public static final double WHEEL_RAD = 2.130;
+  public static final double WHEEL_RADIUS = 2.130;
   
   /**
-   * The robot width in centimeters.
+   * The robot width.
    */
   public static final double TRACK = 12.25;
   
   /**
+<<<<<<< HEAD
    * The degree error.
    */
   public static final double DEG_ERR = 3.0;
@@ -45,61 +47,102 @@ public class Resources {
    * SLOW speed
    */
   public static final int SLOW_SPEED = 100;
+=======
+   * The left radius.
+   */
+  public static final double LEFT_RADIUS = 2.130;
   
   /**
-   * The speed at which the robot rotates in degrees per second.
+   * The right radius.
    */
-  public static final int ROTATE_SPEED = 150;
+  public static final double RIGHT_RADIUS = 2.130;
   
   /**
-   * The motor acceleration in degrees per second squared.
+   * The width.
    */
+  public static final double WIDTH = 15.8;
+  
+  /**
+   * The odometer timeout period.
+   */
+  public static final int TIMEOUT_PERIOD = 50;
+  
+  /**
+   * The fast speed.
+   */
+  public static final int FAST = 200;
+>>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
+  
+  /**
+   * The slow speed.
+   */
+  public static final int SLOW = 100;
+  
+  /**
+   * The acceleration.
+   */
+<<<<<<< HEAD
   public static final int ACCELERATION = 500;
+=======
+  public static final int ACCELERATION = 4000;
+>>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
   
   /**
-   * Timeout period in milliseconds.
+   * The degree error.
    */
-  public static final int TIMEOUT_PERIOD = 3000;
+  public static final double DEG_ERR = 3.0;
   
   /**
-   * The tile size in centimeters.
+   * The cm error.
    */
-  public static final double TILE_SIZE = 30.48;
+  public static final double CM_ERR = 1.0;
   
   /**
    * The left motor.
    */
-  public static final EV3LargeRegulatedMotor leftMotor =
-      new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-
+  public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
+  
   /**
    * The right motor.
    */
-  public static final EV3LargeRegulatedMotor rightMotor =
-      new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-  
-  /**
-   * The color sensor.
-   */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+  public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
   
   /**
    * The ultrasonic sensor.
    */
   public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
   
+  /**
+   * The color sensor.
+   */
+  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+  
+<<<<<<< HEAD
+  /**
+   * The ultrasonic sensor.
+   */
+  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
+  
 
+=======
+>>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
   /**
    * The LCD.
    */
   public static final TextLCD LCD = LocalEV3.get().getTextLCD();
   
   /**
-   * The odometer.
+   * The ultrasonic poller.
    */
-  public static Odometer odometer = Odometer.getOdometer();
+  public static UltrasonicPoller usPoller = new UltrasonicPoller();
   
   /**
+   * The odometer.
+   */
+  public static Odometer odometer = new Odometer();
+  
+  /**
+<<<<<<< HEAD
    * The ultrasonic poller.
    */
   public static UltrasonicPoller usPoller = new UltrasonicPoller();
@@ -110,4 +153,10 @@ public class Resources {
   public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
   
   
+=======
+   * The obstacle avoidance.
+   */
+  public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+
+>>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
 }
