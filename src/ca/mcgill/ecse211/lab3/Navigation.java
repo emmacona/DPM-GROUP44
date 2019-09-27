@@ -2,38 +2,46 @@ package ca.mcgill.ecse211.lab3;
 
 import static ca.mcgill.ecse211.lab3.Resources.*;
 //static imports to avoid duplicating variables and make the code easier to read
-import static java.lang.Math.*;
 
 public class Navigation extends Thread {
 
-	// Class variables
+	/**
+	 * boolean to track navigating
+	 */
 	private static boolean isNavigating; // false by default
 
-	// Class constants
+	/**
+	 * current angle, x , and y positions
+	 */
 	public static double currentAngle, currentX, currentY;
+	
 	/**
 	 * The odometer update period in ms.
 	 */
-	public static final long ODOMETER_PERIOD = 25;
+	private static final long ODOMETER_PERIOD = 25;
 
+	
 	public void run() {
 		long updateStart, updateEnd;
-
-		// Get robot's current coordinates
-		currentAngle = odometer.getXYT()[2];
-		currentX = odometer.getXYT()[0];
-		currentY = odometer.getXYT()[1];
-
-		// This ensures that the odometer only runs once every period
-		updateStart = System.currentTimeMillis();
-		updateEnd = System.currentTimeMillis();
-
-		if (updateEnd - updateStart < ODOMETER_PERIOD) {
-			try {
-				Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
-			} catch (InterruptedException e) {
-				// there is nothing to be done
-			}
+		while (true) {
+			updateStart = System.currentTimeMillis();
+			
+			// get coordinates
+			currentAngle = odometer.getXYT()[2];
+			currentX = odometer.getXYT()[0];
+			currentY = odometer.getXYT()[1];
+			
+			// this ensures that the odometer only runs once every period
+		      updateEnd = System.currentTimeMillis();
+		      if (updateEnd - updateStart < ODOMETER_PERIOD) {
+		        try {
+		          Thread.sleep(ODOMETER_PERIOD - (updateEnd - updateStart));
+		        } catch (InterruptedException e) {
+		          // there is nothing to be done here because it is not
+		          // expected that the odometer will be interrupted by
+		          // another thread
+		        }
+		      }
 		}
 	}
 
@@ -90,7 +98,7 @@ public class Navigation extends Thread {
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
-		// Get theta
+		// convert theta reading to degrees
 		theta = Math.toDegrees(theta);
 
 		// turn to calculated angle
@@ -98,7 +106,7 @@ public class Navigation extends Thread {
 
 		isNavigating = true;
 
-		// rotate the appropriate direction (sign on theta accounts for direction
+		// rotate the appropriate direction
 		leftMotor.rotate(rotation, true);
 		rightMotor.rotate(-rotation, false);
 		isNavigating = false;

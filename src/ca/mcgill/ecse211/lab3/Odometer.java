@@ -10,12 +10,6 @@ import static ca.mcgill.ecse211.lab2.Resources.*;
 /**
  * The odometer class keeps track of the robot's (x, y, theta) position.
  * 
- * @author Rodrigo Silva
- * @author Dirk Dubois
- * @author Derek Yu
- * @author Karim El-Baba
- * @author Michael Smith
- * @author Younes Boubekeur
  */
 
 public class Odometer implements Runnable {

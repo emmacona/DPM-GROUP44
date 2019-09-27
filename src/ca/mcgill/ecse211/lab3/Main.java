@@ -11,9 +11,6 @@ import static ca.mcgill.ecse211.lab3.Resources.*;
  */
 public class Main {
 
-	// TODO: create class(es) to handle ultrasonic controller readings
-	// TODO: javadoc for everything
-
 	/**
 	 * The main entry point.
 	 * 
@@ -21,18 +18,20 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		int buttonChoice;
-		new Thread(odometer).start();
-
 		buttonChoice = chooseAvoidObstaclesOrFloatMotors();
 
+		new Thread(odometer).start();
+
 		if (buttonChoice == Button.ID_LEFT) {
-			floatMotors();
+			//new Thread(usPoller).start();
+			new Thread(navigation).start();
+			completeCourse();
 		} else {
 			buttonChoice = chooseAvoidObstaclesOrFloatMotors();
 			if (buttonChoice == Button.ID_RIGHT) {
 				new Thread(usPoller).start();
-				new Thread(odometer).start();
 				new Thread(obstacleAvoidance).start();
+				completeCourse();
 			}
 		}
 
@@ -62,9 +61,9 @@ public class Main {
 		int buttonChoice;
 		Display.showText("< Left | Right >",
 				"       |        ",
-				" Float | Avoid  ",
-				"motors | obst-   ",
-				"       | acles ");
+				" Navi- | Avoid  ",
+				"gation | obst-  ",
+				"       | acles  ");
 
 		do {
 			buttonChoice = Button.waitForAnyPress(); // left or right press

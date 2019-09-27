@@ -110,9 +110,14 @@ public class Resources {
 	public static Odometer odometer = new Odometer();
 
 	/**
-
 	 * The obstacle avoidance.
 	 */
 	public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+	
+	/**
+
+	 * The navigation.
+	 */
+	public static Navigation navigation = new Navigation();
 
 }
