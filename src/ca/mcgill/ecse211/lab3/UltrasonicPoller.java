@@ -23,7 +23,7 @@ public class UltrasonicPoller implements Runnable {
       usSensor.fetchSample(usData, 0); // acquire data
       distance = (int) (usData[0] * 100.0); // extract from buffer, convert to cm, cast to int
 
-      Log.log(Log.Sender.usSensor, Integer.toString(distance));
+      Integer.toString(distance);
 
       Main.sleepFor(50);
     }

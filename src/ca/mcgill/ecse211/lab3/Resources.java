@@ -16,147 +16,103 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
  */
 public class Resources {
 
-  /**
-   * The wheel radius.
-   */
-  public static final double WHEEL_RADIUS = 2.130;
-  
-  /**
-   * The robot width.
-   */
-  public static final double TRACK = 12.25;
-  
-  /**
-<<<<<<< HEAD
-   * The degree error.
-   */
-  public static final double DEG_ERR = 3.0;
-  
-  /**
-   * The cm error.
-   */
-  public static final double CM_ERR = 1.0;
-  
-  /**
-   * The speed at which the robot moves forward in degrees per second.
-   */
-  public static final int FORWARD_SPEED = 200;
-  
-  /**
-   * The speed at which the robot moves forward in degrees per second.
-   * SLOW speed
-   */
-  public static final int SLOW_SPEED = 100;
-=======
-   * The left radius.
-   */
-  public static final double LEFT_RADIUS = 2.130;
-  
-  /**
-   * The right radius.
-   */
-  public static final double RIGHT_RADIUS = 2.130;
-  
-  /**
-   * The width.
-   */
-  public static final double WIDTH = 15.8;
-  
-  /**
-   * The odometer timeout period.
-   */
-  public static final int TIMEOUT_PERIOD = 50;
-  
-  /**
-   * The fast speed.
-   */
-  public static final int FAST = 200;
->>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
-  
-  /**
-   * The slow speed.
-   */
-  public static final int SLOW = 100;
-  
-  /**
-   * The acceleration.
-   */
-<<<<<<< HEAD
-  public static final int ACCELERATION = 500;
-=======
-  public static final int ACCELERATION = 4000;
->>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
-  
-  /**
-   * The degree error.
-   */
-  public static final double DEG_ERR = 3.0;
-  
-  /**
-   * The cm error.
-   */
-  public static final double CM_ERR = 1.0;
-  
-  /**
-   * The left motor.
-   */
-  public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
-  
-  /**
-   * The right motor.
-   */
-  public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
-  
-  /**
-   * The ultrasonic sensor.
-   */
-  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
-  
-  /**
-   * The color sensor.
-   */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
-  
-<<<<<<< HEAD
-  /**
-   * The ultrasonic sensor.
-   */
-  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
-  
+	/**
+	 * The tile size in centimeters.
+	 */
+	public static final double TILE_SIZE = 30.48;
 
-=======
->>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
-  /**
-   * The LCD.
-   */
-  public static final TextLCD LCD = LocalEV3.get().getTextLCD();
-  
-  /**
-   * The ultrasonic poller.
-   */
-  public static UltrasonicPoller usPoller = new UltrasonicPoller();
-  
-  /**
-   * The odometer.
-   */
-  public static Odometer odometer = new Odometer();
-  
-  /**
-<<<<<<< HEAD
-   * The ultrasonic poller.
-   */
-  public static UltrasonicPoller usPoller = new UltrasonicPoller();
-  
-  /**
-   * The obstacle avoidance.
-   */
-  public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
-  
-  
-=======
-   * The obstacle avoidance.
-   */
-  public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+	/**
+	 * The wheel radius.
+	 */
+	public static final double WHEEL_RAD = 2.130;
 
->>>>>>> 97197d7002b63d7a8a3a71b458b74254bb56a373
+	/**
+	 * The robot width.
+	 */
+	public static final double TRACK = 12.25;
+
+	/**
+	 * The speed at which the robot moves forward in degrees per second.
+	 */
+	public static final int FORWARD_SPEED = 200;
+
+	/**
+	 * The speed at which the robot moves forward in degrees per second.
+	 * SLOW speed
+	 */
+	public static final int SLOW_SPEED = 100;
+
+	/**
+	 * The rotate speed.
+	 */
+	public static final int ROTATE_SPEED = 150;
+
+	/**
+	 * The width.
+	 */
+	public static final double WIDTH = 15.8;
+
+	/**
+	 * The odometer timeout period.
+	 */
+	public static final int TIMEOUT_PERIOD = 50;
+
+
+	/**
+	 * The acceleration.
+	 */
+	public static final int ACCELERATION = 500;
+
+
+	/**
+	 * The degree error.
+	 */
+	public static final double DEG_ERR = 3.0;
+
+	/**
+	 * The cm error.
+	 */
+	public static final double CM_ERR = 1.0;
+
+	/**
+	 * The left motor.
+	 */
+	public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
+
+	/**
+	 * The right motor.
+	 */
+	public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
+
+	/**
+	 * The ultrasonic sensor.
+	 */
+	public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
+
+	/**
+	 * The color sensor.
+	 */
+	public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+
+	/**
+	 * The LCD.
+	 */
+	public static final TextLCD LCD = LocalEV3.get().getTextLCD();
+
+	/**
+	 * The ultrasonic poller.
+	 */
+	public static UltrasonicPoller usPoller = new UltrasonicPoller();
+
+	/**
+	 * The odometer.
+	 */
+	public static Odometer odometer = new Odometer();
+
+	/**
+
+	 * The obstacle avoidance.
+	 */
+	public static ObstacleAvoidance obstacleAvoidance = new ObstacleAvoidance();
+
 }
