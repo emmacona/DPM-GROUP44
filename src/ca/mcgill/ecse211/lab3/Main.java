@@ -3,6 +3,7 @@ package ca.mcgill.ecse211.lab3;
 import static ca.mcgill.ecse211.lab3.Resources.*;
 import java.io.FileNotFoundException;
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 
 /**
  * The main class.
@@ -39,18 +40,21 @@ public class Main {
 		if (buttonChoice == Button.ID_LEFT) {
 			new Thread(usPoller).start();
 			new Thread(odometer).start();
+			completeCourse(false);
 		} else {
 			buttonChoice = chooseAvoidObstaclesOrFloatMotors();
 			if (buttonChoice == Button.ID_RIGHT) {
 				new Thread(usPoller).start();
 				new Thread(odometer).start();
 				new Thread(obstacleAvoidance).start();
+				completeCourse(true);
 			}
 		}
-		
-		completeCourse();
 
 		new Thread(new Display()).start();
+		
+		Sound.beep();
+		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
 		} // do nothing
 
@@ -88,11 +92,12 @@ public class Main {
   /**
    * Completes a course.
    */
-  private static void completeCourse() {
+  private static void completeCourse(boolean avoid) {
     int[][] waypoints = {{2, 2}, {3, 3}};
-
+    
     for (int[] point : waypoints) {
-      Navigation.travelTo(point[0]*TILE_SIZE, point[1]*TILE_SIZE, true);
+      Navigation.travelTo(point[0]*TILE_SIZE, point[1]*TILE_SIZE, avoid);
+      
       while (ObstacleAvoidance.traveling) {
         Main.sleepFor(500);
       }

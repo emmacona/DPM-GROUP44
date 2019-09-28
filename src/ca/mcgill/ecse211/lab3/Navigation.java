@@ -18,6 +18,7 @@ package ca.mcgill.ecse211.lab3;
 import static ca.mcgill.ecse211.lab3.Resources.*;
 //static imports to avoid duplicating variables and make the code easier to read
 import static java.lang.Math.*;
+import lejos.hardware.Sound;
 
 /**
  * Class that offers static methods used for navigation.
@@ -139,7 +140,7 @@ public class Navigation {
 
     while (abs(error) > DEG_ERR) {
       error = angle - odometer.getTheta();
-
+      
       if (error < -180.0) {
         setSpeeds(-SLOW, SLOW);
       } else if (error < 0.0) {
@@ -149,6 +150,9 @@ public class Navigation {
       } else {
         setSpeeds(-SLOW, SLOW);
       }
+      
+      leftMotor.forward();
+      rightMotor.forward();
     }
 
     if (stop) {
