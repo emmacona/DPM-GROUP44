@@ -93,7 +93,7 @@ public class Main {
    * Completes a course.
    */
   private static void completeCourse(boolean avoid) {
-    int[][] waypoints = {{2, 2}, {3, 3}};
+    int[][] waypoints = {{2, 2}, {3, 1}};
     
     for (int[] point : waypoints) {
       Navigation.travelTo(point[0]*TILE_SIZE, point[1]*TILE_SIZE, avoid);

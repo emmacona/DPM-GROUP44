@@ -70,6 +70,9 @@ public class Navigation {
       minAng = getDestAngle(x, y);
       turnTo(minAng, false);
       setSpeeds(FAST, FAST);
+      
+      leftMotor.forward();
+      rightMotor.forward();
     }
     setSpeeds(0, 0);
   }
@@ -138,22 +141,53 @@ public class Navigation {
   public static void turnTo(double angle, boolean stop) {
     double error = angle - odometer.getTheta();
 
+    // EXPERIMENTAL: IF CAN'T GET THIS TO WORK, USE COMMENTED-OUT SECTION BELOW
+    // TODO: fix these rotation angles, probably through fixing the signs in the parentheses
+    if (abs(error) > DEG_ERR) {
+      if (error > 180.0) {
+        leftMotor.rotate(convertAngle(error), true);
+        rightMotor.rotate(-convertAngle(error), false);
+      } else if (error < -180.0) {
+        leftMotor.rotate(convertAngle(error), true);
+        rightMotor.rotate(-convertAngle(error), false);
+      } else if (error > 0.0) {
+        leftMotor.rotate(convertAngle(error), true);
+        rightMotor.rotate(-convertAngle(error), false);
+      } else if (error < 0.0) {
+        leftMotor.rotate(convertAngle(error), true);
+        rightMotor.rotate(-convertAngle(error), false);
+      }
+
+    }
+
+    /*
     while (abs(error) > DEG_ERR) {
       error = angle - odometer.getTheta();
       
+      setSpeeds(SLOW, SLOW);
+      
       if (error < -180.0) {
-        setSpeeds(-SLOW, SLOW);
+        // setSpeeds(-SLOW, SLOW);
+        leftMotor.backward();
+        rightMotor.forward();
       } else if (error < 0.0) {
-        setSpeeds(SLOW, -SLOW);
+        // setSpeeds(SLOW, -SLOW);
+        leftMotor.forward();
+        rightMotor.backward();
       } else if (error > 180.0) {
-        setSpeeds(SLOW, -SLOW);
+        // setSpeeds(SLOW, -SLOW);
+        leftMotor.forward();
+        rightMotor.backward();
       } else {
-        setSpeeds(-SLOW, SLOW);
+        // setSpeeds(-SLOW, SLOW);
+        leftMotor.backward();
+        rightMotor.forward();
       }
       
-      leftMotor.forward();
-      rightMotor.forward();
+      // leftMotor.forward();
+      // rightMotor.forward();
     }
+    */
 
     if (stop) {
       setSpeeds(0, 0);
@@ -171,5 +205,26 @@ public class Navigation {
     double y = odometer.getY() + sin(toRadians(odometer.getTheta())) * distance;
 
     travelTo(x, y, avoid);
+  }
+  
+  /**
+   * Converts input distance to the total rotation of each wheel needed to cover that distance.
+   * 
+   * @param distance
+   * @return the wheel rotations necessary to cover the distance
+   */
+  public static int convertDistance(double distance) {
+    return (int) ((180.0 * distance) / (Math.PI * WHEEL_RADIUS));
+  }
+
+  /**
+   * Converts input angle to the total rotation of each wheel needed to rotate the robot by that
+   * angle.
+   * 
+   * @param angle
+   * @return the wheel rotations necessary to rotate the robot by the angle
+   */
+  public static int convertAngle(double angle) {
+    return convertDistance(Math.PI * TRACK * angle / 360.0);
   }
 }
