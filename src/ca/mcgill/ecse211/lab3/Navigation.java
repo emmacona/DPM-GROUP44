@@ -107,8 +107,8 @@ public class Navigation implements Runnable {
 
 	private static void obstacleAvoidance() {
 		// TODO Auto-generated method stub
-		rightMotor.setSpeed(ROTATE_SPEED);
-		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(FORWARD_SPEED);
+		leftMotor.setSpeed(FORWARD_SPEED);
 
 		// if wall turn 90 deg
 		rightMotor.rotate(-90, true);
@@ -136,48 +136,67 @@ public class Navigation implements Runnable {
 	 * @param stop controls whether or not to stop the motors when the turn is completed
 	 */
 	public static void turnTo(double angle) {
-		// since angle is always positive, make currentT always positive, too
-		double currentT = odometer.getXYT()[2];
-		if( currentT < 0.0 ) {
-			currentT += 360.0;
-		}
-
-		double error = angle - currentT;
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-
-		if (abs(error) > DEG_ERR) {
-			if (error > 180.0) {
-				leftMotor.rotate(-convertAngle(360 - error), true);
-				rightMotor.rotate(convertAngle(360 - error), false);
-			} else if (error < -180.0) {
-				leftMotor.rotate(convertAngle(360 + error), true);
-				rightMotor.rotate(-convertAngle(360 + error), false);
-			} else if (error > 0.0) {
-				leftMotor.rotate(convertAngle(error), true);
-				rightMotor.rotate(-convertAngle(error), false);
-			} else if (error < 0.0) {
-				leftMotor.rotate(-convertAngle(error), true);
-				rightMotor.rotate(convertAngle(error), false);
-			}
-		}
 		
+	    double error = angle - odometer.getXYT()[2];
+
+	    while (abs(error) > DEG_ERR) {
+	      error = angle - odometer.getXYT()[2];
+
+	      if (error > 180) {
+	    	  setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
+	      } else if (error > 0 && error <= 180) {
+	    	  setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
+	      }
+	      
+	      //leftMotor.forward();
+	      //rightMotor.forward();
+	    }
+		
+//		// since angle is always positive, make currentT always positive, too
+//		double currentT = odometer.getXYT()[2];
+//		if( currentT < 0.0 ) {
+//			currentT += 360.0;
+//		}
+//
+//		double error = angle - currentT;
+//		leftMotor.setSpeed(ROTATE_SPEED);
+//		rightMotor.setSpeed(ROTATE_SPEED);
+
 //		if (abs(error) > DEG_ERR) {
 //			if (error > 180.0) {
-//				leftMotor.rotate(convertAngle(angle), true);
-//				rightMotor.rotate(-convertAngle(angle), false);
+//				leftMotor.rotate(-convertAngle(360 - error), true);
+//				rightMotor.rotate(convertAngle(360 - error), false);
 //			} else if (error < -180.0) {
-//				leftMotor.rotate(-convertAngle(angle), true);
-//				rightMotor.rotate(convertAngle(angle), false);
+//				leftMotor.rotate(convertAngle(360 + error), true);
+//				rightMotor.rotate(-convertAngle(360 + error), false);
 //			} else if (error > 0.0) {
-//				leftMotor.rotate(convertAngle(angle), true);
-//				rightMotor.rotate(-convertAngle(angle), false);
+//				leftMotor.rotate(convertAngle(error), true);
+//				rightMotor.rotate(-convertAngle(error), false);
 //			} else if (error < 0.0) {
-//				leftMotor.rotate(convertAngle(angle), true);
-//				rightMotor.rotate(-convertAngle(angle), false);
+//				leftMotor.rotate(-convertAngle(error), true);
+//				rightMotor.rotate(convertAngle(error), false);
 //			}
 //		}
-		// setSpeeds(0, 0);
+		
+//	    double error = angle - odometer.getXYT()[2];
+//
+//	    while (abs(error) > DEG_ERR) {
+//	      error = angle - odometer.getXYT()[2];
+//
+//	      if (error < -180.0) {
+//	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
+//	      } else if (error < 0.0) {
+//	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
+//	      } else if (error > 180.0) {
+//	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
+//	      } else {
+//	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
+//	      }
+//	      
+//	      //leftMotor.forward();
+//	      //rightMotor.forward();
+//	    }
+		
 	}
 
 

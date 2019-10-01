@@ -53,7 +53,7 @@ public class Resources {
 	/**
 	 * The motor acceleration in degrees per second squared.
 	 */
-	public static final int ACCELERATION = 1000;
+	public static final int ACCELERATION = 3000;
 
 	/**
 	 * Timeout period in milliseconds.
