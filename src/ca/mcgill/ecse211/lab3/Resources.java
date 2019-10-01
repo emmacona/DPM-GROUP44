@@ -38,7 +38,7 @@ public class Resources {
 	/**
 	 * The robot width in centimeters.
 	 */
-	public static final double TRACK = 11;
+	public static final double TRACK = 11.5;
 
 	/**
 	 * The speed at which the robot moves forward in degrees per second.
@@ -53,7 +53,7 @@ public class Resources {
 	/**
 	 * The motor acceleration in degrees per second squared.
 	 */
-	public static final int ACCELERATION = 3000;
+	public static final int ACCELERATION = 1000;
 
 	/**
 	 * Timeout period in milliseconds.

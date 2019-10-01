@@ -20,9 +20,9 @@ public class Navigation implements Runnable {
 		int[][] waypoints = map1;
 
 		for (int[] point : waypoints) {
-		  // since starts at (1, 1), only want to travel 2 tile sizes for (1, 3)
-		  // so need to subtract 1 from all the coordinates
-		  travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
+			// since starts at (1, 1), only want to travel 2 tile sizes for (1, 3)
+			// so need to subtract 1 from all the coordinates
+			travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
 		} 
 	}
 
@@ -47,7 +47,7 @@ public class Navigation implements Runnable {
 		if (isDone(x,y)) {
 			Sound.beep();
 		}
-		*/
+		 */
 
 		while (!isDone(x, y)) { // while not at way point
 			// get coordinates
@@ -57,10 +57,10 @@ public class Navigation implements Runnable {
 			// since turning in place, don't need to worry about obstacles yet
 			minAng = getDestAngle(x, y); // determine angle need to turn to
 			turnTo(minAng); // turn to this angle
-
 			leftMotor.forward();
 			rightMotor.forward();
-			
+
+
 			/*
             usSensor.fetchSample(usValues, 0); // from wall following lab
 
@@ -71,27 +71,29 @@ public class Navigation implements Runnable {
                 obstacleAvoidance();
                 // break;
             }
-            */
+			 */
 
-            
+
 			double distRemaining = distRemaining(Math.abs(currentX - x), Math.abs(currentY - y));
 			int rotation = convertDistance(distRemaining);
 			leftMotor.rotate(rotation, true);
 			rightMotor.rotate(rotation, false);
-			
-			
+
+			leftMotor.forward();
+			rightMotor.forward();
+
 			// Sound.beep();
 
-			
-			while (!isDone(x, y)) {
-				currentX = odometer.getXYT()[0];
-				currentY = odometer.getXYT()[1];
+
+			while (true) {
+				//				currentX = odometer.getXYT()[0];
+				//				currentY = odometer.getXYT()[1];
 
 				usSensor.fetchSample(usValues, 0); // from wall following lab
 
 				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
 				// check if safe distance from a block
-				if (distanceCheck < BAND_WIDTH) {
+				if (distanceCheck < BAND_WIDTH * 100) {
 					obstacleAvoidance();
 					break;
 				}
@@ -135,22 +137,22 @@ public class Navigation implements Runnable {
 	 */
 	public static void turnTo(double angle) {
 		// since angle is always positive, make currentT always positive, too
-	    double currentT = odometer.getXYT()[2];
+		double currentT = odometer.getXYT()[2];
 		if( currentT < 0.0 ) {
 			currentT += 360.0;
 		}
-		
+
 		double error = angle - currentT;
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
 		if (abs(error) > DEG_ERR) {
 			if (error > 180.0) {
-				leftMotor.rotate(-convertAngle(error), true);
-				rightMotor.rotate(convertAngle(error), false);
+				leftMotor.rotate(-convertAngle(360 - error), true);
+				rightMotor.rotate(convertAngle(360 - error), false);
 			} else if (error < -180.0) {
-				leftMotor.rotate(convertAngle(error), true);
-				rightMotor.rotate(-convertAngle(error), false);
+				leftMotor.rotate(convertAngle(360 + error), true);
+				rightMotor.rotate(-convertAngle(360 + error), false);
 			} else if (error > 0.0) {
 				leftMotor.rotate(convertAngle(error), true);
 				rightMotor.rotate(-convertAngle(error), false);
@@ -159,7 +161,22 @@ public class Navigation implements Runnable {
 				rightMotor.rotate(convertAngle(error), false);
 			}
 		}
-
+		
+//		if (abs(error) > DEG_ERR) {
+//			if (error > 180.0) {
+//				leftMotor.rotate(convertAngle(angle), true);
+//				rightMotor.rotate(-convertAngle(angle), false);
+//			} else if (error < -180.0) {
+//				leftMotor.rotate(-convertAngle(angle), true);
+//				rightMotor.rotate(convertAngle(angle), false);
+//			} else if (error > 0.0) {
+//				leftMotor.rotate(convertAngle(angle), true);
+//				rightMotor.rotate(-convertAngle(angle), false);
+//			} else if (error < 0.0) {
+//				leftMotor.rotate(convertAngle(angle), true);
+//				rightMotor.rotate(-convertAngle(angle), false);
+//			}
+//		}
 		// setSpeeds(0, 0);
 	}
 
@@ -198,9 +215,9 @@ public class Navigation implements Runnable {
 	 * @return {@code true} when done.
 	 */
 	public static boolean isDone(double x, double y) {
-	  // double error = Math.sqrt(Math.pow((odometer.getXYT()[0] - x), 2) + Math.pow((odometer.getXYT()[1] - y), 2));
-	  double error = distRemaining(odometer.getXYT()[0] - x, odometer.getXYT()[1] - y);
-	  return error < CM_ERR;
+		// double error = Math.sqrt(Math.pow((odometer.getXYT()[0] - x), 2) + Math.pow((odometer.getXYT()[1] - y), 2));
+		double error = distRemaining(odometer.getXYT()[0] - x, odometer.getXYT()[1] - y);
+		return error < CM_ERR;
 	}
 
 
