@@ -99,48 +99,48 @@ public class Navigation implements Runnable {
 		double minAng;
 
 
-		//while (!isDone(x, y)) { // while not at way point
-		// get coordinates
-		currentX = odometer.getXYT()[0];
-		currentY = odometer.getXYT()[1];
-		deltaX = x-currentX;
-		deltaY = y-currentY;
-		minAng = Math.atan2(deltaX, deltaY); // determine angle need to turn to
-
-		// set speeds
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-
-		// turn to
-		turnTo(minAng); // turn to this angle
-
-		// distance remaining to point
-		double distRemaining = distRemaining(deltaX, deltaY);
-		int rotation = convertDistance(distRemaining);
-
-		leftMotor.setSpeed(FORWARD_SPEED);
-		rightMotor.setSpeed(FORWARD_SPEED);
-
-		leftMotor.rotate(rotation, true);
-		rightMotor.rotate(rotation, false);
-
-		leftMotor.forward();
-		rightMotor.forward();
-
-		while (!isDone(x, y)) {
+		while (!isDone(x, y)) { // while not at way point
+			// get coordinates
 			currentX = odometer.getXYT()[0];
 			currentY = odometer.getXYT()[1];
+			deltaX = x-currentX;
+			deltaY = y-currentY;
+			minAng = Math.atan2(deltaX, deltaY); // determine angle need to turn to
 
-			usSensor.fetchSample(usValues, 0); // from wall following lab
+			// set speeds
+			leftMotor.setSpeed(ROTATE_SPEED);
+			rightMotor.setSpeed(ROTATE_SPEED);
 
-			int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
-			// check if safe distance from a block
-			if (distanceCheck < BAND_WIDTH * 100) {
-				obstacleAvoidance();
-				break;
+			// turn to
+			turnTo(minAng); // turn to this angle
+
+			// distance remaining to point
+			double distRemaining = distRemaining(deltaX, deltaY);
+			int rotation = convertDistance(distRemaining);
+
+			leftMotor.setSpeed(FORWARD_SPEED);
+			rightMotor.setSpeed(FORWARD_SPEED);
+
+			leftMotor.rotate(rotation, true);
+			rightMotor.rotate(rotation, false);
+
+			leftMotor.forward();
+			rightMotor.forward();
+
+			while (!isDone(x, y)) {
+				currentX = odometer.getXYT()[0];
+				currentY = odometer.getXYT()[1];
+
+				usSensor.fetchSample(usValues, 0); // from wall following lab
+
+				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
+				// check if safe distance from a block
+				if (distanceCheck < BAND_WIDTH * 100) {
+					obstacleAvoidance();
+					break;
+				}
 			}
 		}
-		//}
 	}
 
 	private static void obstacleAvoidance() {
@@ -188,10 +188,10 @@ public class Navigation implements Runnable {
 
 		rightMotor.rotate(-convertAngle(deltaT), true);
 		leftMotor.rotate(convertAngle(deltaT), false);
-		
+		//		}
 		rightMotor.stop();
 		leftMotor.stop();
-		
+
 		//leftMotor.forward();
 		//rightMotor.forward();
 		//}
@@ -222,24 +222,6 @@ public class Navigation implements Runnable {
 		//			}
 		//		}
 
-		//	    double error = angle - odometer.getXYT()[2];
-		//
-		//	    while (abs(error) > DEG_ERR) {
-		//	      error = angle - odometer.getXYT()[2];
-		//
-		//	      if (error < -180.0) {
-		//	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
-		//	      } else if (error < 0.0) {
-		//	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
-		//	      } else if (error > 180.0) {
-		//	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
-		//	      } else {
-		//	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
-		//	      }
-		//	      
-		//			leftMotor.forward();
-		//			rightMotor.forward();
-		//		}
 
 	}
 
