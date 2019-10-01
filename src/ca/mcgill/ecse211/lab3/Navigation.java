@@ -20,7 +20,9 @@ public class Navigation implements Runnable {
 		int[][] waypoints = map1;
 
 		for (int[] point : waypoints) {
-			travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
+		  // since starts at (1, 1), only want to travel 2 tile sizes for (1, 3)
+		  // so need to subtract 1 from all the coordinates
+		  travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
 		} 
 	}
 
@@ -41,26 +43,46 @@ public class Navigation implements Runnable {
 		double currentY;
 		double minAng;
 
+		/*
 		if (isDone(x,y)) {
 			Sound.beep();
 		}
+		*/
 
 		while (!isDone(x, y)) { // while not at way point
 			// get coordinates
 			currentX = odometer.getXYT()[0];
 			currentY = odometer.getXYT()[1];
 
+			// since turning in place, don't need to worry about obstacles yet
 			minAng = getDestAngle(x, y); // determine angle need to turn to
 			turnTo(minAng); // turn to this angle
 
 			leftMotor.forward();
 			rightMotor.forward();
+			
+			/*
+            usSensor.fetchSample(usValues, 0); // from wall following lab
 
+            int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
+            // check if safe distance from a block
+            if (distanceCheck < BAND_WIDTH) {
+                Sound.beep();
+                obstacleAvoidance();
+                // break;
+            }
+            */
+
+            
 			double distRemaining = distRemaining(Math.abs(currentX - x), Math.abs(currentY - y));
 			int rotation = convertDistance(distRemaining);
 			leftMotor.rotate(rotation, true);
 			rightMotor.rotate(rotation, false);
+			
+			
+			// Sound.beep();
 
+			
 			while (!isDone(x, y)) {
 				currentX = odometer.getXYT()[0];
 				currentY = odometer.getXYT()[1];
@@ -74,7 +96,11 @@ public class Navigation implements Runnable {
 					break;
 				}
 			}
+			// doesn't get here yet
+			Sound.beep();
 		}
+		// doesn't get here yet
+		Sound.beep();
 	}
 
 	private static void obstacleAvoidance() {
@@ -108,10 +134,12 @@ public class Navigation implements Runnable {
 	 * @param stop controls whether or not to stop the motors when the turn is completed
 	 */
 	public static void turnTo(double angle) {
-		double currentT = odometer.getXYT()[2];
+		// since angle is always positive, make currentT always positive, too
+	    double currentT = odometer.getXYT()[2];
 		if( currentT < 0.0 ) {
 			currentT += 360.0;
 		}
+		
 		double error = angle - currentT;
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
@@ -170,8 +198,9 @@ public class Navigation implements Runnable {
 	 * @return {@code true} when done.
 	 */
 	public static boolean isDone(double x, double y) {
-		double error = Math.sqrt(Math.pow((odometer.getXYT()[0] - x), 2) + Math.pow((odometer.getXYT()[1] - y), 2));
-		return error < CM_ERR;
+	  // double error = Math.sqrt(Math.pow((odometer.getXYT()[0] - x), 2) + Math.pow((odometer.getXYT()[1] - y), 2));
+	  double error = distRemaining(odometer.getXYT()[0] - x, odometer.getXYT()[1] - y);
+	  return error < CM_ERR;
 	}
 
 
