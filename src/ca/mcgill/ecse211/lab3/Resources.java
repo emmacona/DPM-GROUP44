@@ -73,7 +73,7 @@ public class Resources {
 	/**
 	 * The cm error.
 	 */
-	public static final double CM_ERR = 5.0;
+	public static final double CM_ERR = 3.0;
 
 	/**
 	 * The left motor.
