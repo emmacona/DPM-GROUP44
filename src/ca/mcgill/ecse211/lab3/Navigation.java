@@ -27,63 +27,6 @@ public class Navigation implements Runnable {
 		} 
 	}
 
-
-	//	/**
-	//	 * Travels to designated position, while constantly updating its heading.
-	//	 * 
-	//	 * @param x the destination x, in cm.
-	//	 * @param y the destination y, in cm.
-	//	 */
-	//	public static void travelTo(double x, double y) {
-	//		//TODO
-	//		double currentX;
-	//		double currentY;
-	//		double deltaX;
-	//		double deltaY;
-	//		double minAng;
-	//		// get coordinates
-	//		currentX = odometer.getXYT()[0];
-	//		currentY = odometer.getXYT()[1];
-	//
-	//		if (isDone(x,y)) {
-	//			Sound.beep();
-	//		}
-	//
-	//		while (!isDone(x, y)) { // while not at way point
-	//			// get coordinates
-	//			currentX = odometer.getXYT()[0];
-	//			currentY = odometer.getXYT()[1];
-	//			deltaX = x-currentX;
-	//			deltaY = y-currentY;
-	//			minAng = Math.atan2(deltaX, deltaY); // determine angle need to turn to
-	//
-	//			turnTo(minAng); // turn to this angle
-	//			// set speeds
-	//			leftMotor.setSpeed(ROTATE_SPEED);
-	//			rightMotor.setSpeed(ROTATE_SPEED);
-	//			leftMotor.forward();
-	//			rightMotor.forward();
-	//
-	//			double distRemaining = distRemaining(Math.abs(currentX - x), Math.abs(currentY - y));
-	//			int rotation = convertDistance(distRemaining);
-	//			leftMotor.rotate(rotation, true);
-	//			rightMotor.rotate(rotation, false);
-	//
-	//			while (!isDone(x, y)) {
-	//				currentX = odometer.getXYT()[0];
-	//				currentY = odometer.getXYT()[1];
-	//
-	//				usSensor.fetchSample(usValues, 0); // from wall following lab
-	//
-	//				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
-	//				// check if safe distance from a block
-	//				if (distanceCheck < BAND_WIDTH) {
-	//					obstacleAvoidance();
-	//					break;
-	//				}
-	//			}
-	//		}
-	//	}
 	/**
 	 * Travels to designated position, while constantly updating its heading.
 	 * 
@@ -92,12 +35,11 @@ public class Navigation implements Runnable {
 	 */
 	public static void travelTo(double x, double y) {
 
-		double currentX;
-		double currentY;
+		double currentX = odometer.getXYT()[0];
+		double currentY = odometer.getXYT()[1];
 		double deltaX;
 		double deltaY;
 		double minAng;
-
 
 		while (!isDone(x, y)) { // while not at way point
 			// get coordinates
@@ -106,26 +48,21 @@ public class Navigation implements Runnable {
 			deltaX = x-currentX;
 			deltaY = y-currentY;
 			minAng = Math.atan2(deltaX, deltaY); // determine angle need to turn to
+			// turn to
+			turnTo(minAng, x, y); // turn to this angle
 
 			// set speeds
 			leftMotor.setSpeed(ROTATE_SPEED);
 			rightMotor.setSpeed(ROTATE_SPEED);
-
-			// turn to
-			turnTo(minAng); // turn to this angle
+			leftMotor.forward();
+			rightMotor.forward();
 
 			// distance remaining to point
 			double distRemaining = distRemaining(deltaX, deltaY);
 			int rotation = convertDistance(distRemaining);
 
-			leftMotor.setSpeed(FORWARD_SPEED);
-			rightMotor.setSpeed(FORWARD_SPEED);
-
 			leftMotor.rotate(rotation, true);
 			rightMotor.rotate(rotation, false);
-
-			leftMotor.forward();
-			rightMotor.forward();
 
 			while (!isDone(x, y)) {
 				currentX = odometer.getXYT()[0];
@@ -135,7 +72,7 @@ public class Navigation implements Runnable {
 
 				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
 				// check if safe distance from a block
-				if (distanceCheck < BAND_WIDTH * 100) {
+				if (distanceCheck < BAND_WIDTH) {
 					obstacleAvoidance();
 					break;
 				}
@@ -173,57 +110,62 @@ public class Navigation implements Runnable {
 	 * @param angle
 	 * @param stop controls whether or not to stop the motors when the turn is completed
 	 */
-	public static void turnTo(double angle) {
-		double deltaT = angle - odometer.getXYT()[2];
-
-		//		while (abs(deltaT) > DEG_ERR) {
-
-		deltaT = angle-odometer.getXYT()[2];
-
-		if(deltaT < -180) {
-			deltaT += 360.0;
-		} else if ( deltaT > 180) {
-			deltaT -= 360.0;
+	public static void turnTo(double angle, double x, double y) {
+		double deltaX = odometer.getXYT()[0] - x;
+		double deltaY = odometer.getXYT()[1] - y;
+		double goTo;
+		
+		// if going to smaller x and smaller y
+		if(deltaX < 0.0 && deltaY < 0.0) {
+			goTo = 180 + angle;
+			leftMotor.rotate(-convertAngle(goTo), true);
+			rightMotor.rotate(convertAngle(goTo), false);
 		}
-
-		rightMotor.rotate(-convertAngle(deltaT), true);
-		leftMotor.rotate(convertAngle(deltaT), false);
-		//		}
-		rightMotor.stop();
-		leftMotor.stop();
-
-		//leftMotor.forward();
-		//rightMotor.forward();
-		//}
-
-		//		// since angle is always positive, make currentT always positive, too
-		//		double currentT = odometer.getXYT()[2];
-		//		if( currentT < 0.0 ) {
-		//			currentT += 360.0;
-		//		}
-		//
-		//		double error = angle - currentT;
-		//		leftMotor.setSpeed(ROTATE_SPEED);
-		//		rightMotor.setSpeed(ROTATE_SPEED);
-
-		//		if (abs(error) > DEG_ERR) {
-		//			if (error > 180.0) {
-		//				leftMotor.rotate(-convertAngle(360 - error), true);
-		//				rightMotor.rotate(convertAngle(360 - error), false);
-		//			} else if (error < -180.0) {
-		//				leftMotor.rotate(convertAngle(360 + error), true);
-		//				rightMotor.rotate(-convertAngle(360 + error), false);
-		//			} else if (error > 0.0) {
-		//				leftMotor.rotate(convertAngle(error), true);
-		//				rightMotor.rotate(-convertAngle(error), false);
-		//			} else if (error < 0.0) {
-		//				leftMotor.rotate(-convertAngle(error), true);
-		//				rightMotor.rotate(convertAngle(error), false);
-		//			}
-		//		}
-
-
+		// if going to smaller x and same or bigger y
+		else if(deltaX < 0.0 && deltaY >= 0.0) {
+			goTo = 180 + angle;
+			leftMotor.rotate(-convertAngle(goTo), true);
+			rightMotor.rotate(convertAngle(goTo), false);
+		}
+		// if going to bigger x and smaller y
+		
+		// if going to bigger or same x and bigger y
+		
 	}
+
+	
+//	/**
+//	 * Turns robot towards the indicated angle.
+//	 * 
+//	 * @param angle
+//	 * @param stop controls whether or not to stop the motors when the turn is completed
+//	 */
+//	public static void turnTo(double angle) {
+//
+//		double error = angle - odometer.getXYT()[2];;                                   
+//		leftMotor.setSpeed(ROTATE_SPEED);
+//		rightMotor.setSpeed(ROTATE_SPEED);
+//
+//		while (abs(error) > DEG_ERR) {
+//			if (error > 180.0) {
+//				error -= 360.0;
+//				leftMotor.rotate(-convertAngle(error), true);
+//				rightMotor.rotate(convertAngle(error), false);
+//			} else if (error < -180.0) {
+//				error += 360.0;
+//				leftMotor.rotate(convertAngle(error), true);
+//				rightMotor.rotate(-convertAngle(error), false);
+//			} else if (error > 0.0) {
+//				leftMotor.rotate(convertAngle(error), true);
+//				rightMotor.rotate(-convertAngle(error), false);
+//			} else if (error < 0.0) {
+//				leftMotor.rotate(-convertAngle(error), true);
+//				rightMotor.rotate(convertAngle(error), false);
+//			}
+//		}
+//		leftMotor.stop();
+//		rightMotor.stop();
+//	}
 
 
 	/**
