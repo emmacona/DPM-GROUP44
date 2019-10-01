@@ -1,230 +1,218 @@
 package ca.mcgill.ecse211.lab3;
-/*
- * File: Navigation.java
- * Written by: Sean Lawlor
- * ECSE 211 - Design Principles and Methods, Head TA
- * Fall 2011
- * Ported to EV3 by: Francois Ouellet Delorme
- * Fall 2015
- * Helper methods - Jonah Caplan
- * 2015
- * Refactored codebase (see GitHub for future changes) - Younes Boubekeur
- * Winter 2019
- * 
- * 
- * Movement control class (turnTo, travelTo, flt, localize)
- */
 
 import static ca.mcgill.ecse211.lab3.Resources.*;
-//static imports to avoid duplicating variables and make the code easier to read
-import static java.lang.Math.*;
+import static java.lang.Math.PI;
+import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
+
 import lejos.hardware.Sound;
 
-/**
- * Class that offers static methods used for navigation.
- */
-public class Navigation {
-  
-  static {
-    leftMotor.setAcceleration(ACCELERATION);
-    rightMotor.setAcceleration(ACCELERATION);
-  }
+public class Navigation implements Runnable {
 
-  /**
-   * Sets the motor speeds jointly.
-   */
-  public static void setSpeeds(float leftSpeed, float rightSpeed) {
-    leftMotor.setSpeed(leftSpeed);
-    rightMotor.setSpeed(rightSpeed);
-    if (leftSpeed < 0) {
-      leftMotor.backward();
-    } else {
-      leftMotor.forward();
-    }
-    if (rightSpeed < 0) {
-      rightMotor.backward();
-    } else {
-      rightMotor.forward();
-    }
-  }
+	int [][] map1 = {{1, 3}, {2 ,2}, {3, 3}, {3, 2}, {2, 1}};
+	int [][] map2 = {{2, 2}, {1, 3}, {3, 3}, {3, 2}, {2, 1}};
+	int [][] map3 = {{2, 1}, {3, 2}, {3, 3}, {1, 3}, {2, 2}};
+	int [][] map4 = {{1, 2}, {2, 3}, {2, 1}, {3, 2}, {3, 3}};
 
-  /**
-   * Floats the two motors jointly.
-   */
-  public static void setFloat() {
-    leftMotor.stop();
-    rightMotor.stop();
-    leftMotor.flt(true);
-    rightMotor.flt(true);
-  }
+	public static boolean isNavigating;
 
-  /**
-   * Travels to designated position, while constantly updating its heading.
-   * 
-   * @param x the destination x, in cm.
-   * @param y the destination y, in cm.
-   */
-  public static void travelTo(double x, double y) {
-    double minAng;
-    while (!isDone(x, y)) {
-      minAng = getDestAngle(x, y);
-      turnTo(minAng, false);
-      setSpeeds(FAST, FAST);
-      
-      leftMotor.forward();
-      rightMotor.forward();
-    }
-    setSpeeds(0, 0);
-  }
-  
-  /**
-   * Travels to designated position, while constantly updating the heading.
-   * @param x
-   * @param y
-   * @param avoid
-   */
-  public static void travelTo(double x, double y, boolean avoid) {
-    if (avoid) {
-      ObstacleAvoidance.destx = x;
-      ObstacleAvoidance.desty = y;
-      
-      // This will trigger the state machine running in the obstacleAvoidance thread
-      ObstacleAvoidance.traveling = true; 
-    } else {
-      Navigation.travelTo(x, y);
-    }
-  }
+	public void run() {
+		int[][] waypoints = map1;
 
-  /**
-   * Returns {@code true} when done.
-   * 
-   * @param x
-   * @param y
-   * @return {@code true} when done.
-   */
-  public static boolean isDone(double x, double y) {
-    return abs(x - odometer.getX()) < CM_ERR
-        && abs(y - odometer.getY()) < CM_ERR;
-  }
+		for (int[] point : waypoints) {
+			travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
+		} 
+	}
 
-  /**
-   * Returns {@code true} when facing destination.
-   * 
-   * @param angle
-   * @return {@code true} when facing destination.
-   */
-  public static boolean facingDest(double angle) {
-    return abs(angle - odometer.getTheta()) < DEG_ERR;
-  }
+	/**
+	 * Travels to designated position, while constantly updating its heading.
+	 * 
+	 * @param x the destination x, in cm.
+	 * @param y the destination y, in cm.
+	 */
+	public static void travelTo(double x, double y) {
+		//TODO
+		//		isNavigating = true;
 
-  /**
-   * Returns the destination angle.
-   * 
-   * @param x
-   * @param y
-   * @return the destination angle.
-   */
-  public static double getDestAngle(double x, double y) {
-    double minAng = (atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / PI);
-    if (minAng < 0) {
-      minAng += 360.0;
-    }
-    return minAng;
-  }
+		//		// get current coordinates
+		//		double currentX = odometer.getXYT()[0];
+		//		double currentY = odometer.getXYT()[1];
+		double currentX;
+		double currentY;
+		double minAng;
 
-  /**
-   * Turns robot towards the indicated angle.
-   * 
-   * @param angle
-   * @param stop controls whether or not to stop the motors when the turn is completed
-   */
-  public static void turnTo(double angle, boolean stop) {
-    double error = angle - odometer.getTheta();
+		if (isDone(x,y)) {
+			Sound.beep();
+		}
 
-    // EXPERIMENTAL: IF CAN'T GET THIS TO WORK, USE COMMENTED-OUT SECTION BELOW
-    // TODO: fix these rotation angles, probably through fixing the signs in the parentheses
-    if (abs(error) > DEG_ERR) {
-      if (error > 180.0) {
-        leftMotor.rotate(convertAngle(error), true);
-        rightMotor.rotate(-convertAngle(error), false);
-      } else if (error < -180.0) {
-        leftMotor.rotate(convertAngle(error), true);
-        rightMotor.rotate(-convertAngle(error), false);
-      } else if (error > 0.0) {
-        leftMotor.rotate(convertAngle(error), true);
-        rightMotor.rotate(-convertAngle(error), false);
-      } else if (error < 0.0) {
-        leftMotor.rotate(convertAngle(error), true);
-        rightMotor.rotate(-convertAngle(error), false);
-      }
+		while (!isDone(x, y)) { // while not at way point
+			// get coordinates
+			currentX = odometer.getXYT()[0];
+			currentY = odometer.getXYT()[1];
 
-    }
+			minAng = getDestAngle(x, y); // determine angle need to turn to
+			turnTo(minAng); // turn to this angle
 
-    /*
-    while (abs(error) > DEG_ERR) {
-      error = angle - odometer.getTheta();
-      
-      setSpeeds(SLOW, SLOW);
-      
-      if (error < -180.0) {
-        // setSpeeds(-SLOW, SLOW);
-        leftMotor.backward();
-        rightMotor.forward();
-      } else if (error < 0.0) {
-        // setSpeeds(SLOW, -SLOW);
-        leftMotor.forward();
-        rightMotor.backward();
-      } else if (error > 180.0) {
-        // setSpeeds(SLOW, -SLOW);
-        leftMotor.forward();
-        rightMotor.backward();
-      } else {
-        // setSpeeds(-SLOW, SLOW);
-        leftMotor.backward();
-        rightMotor.forward();
-      }
-      
-      // leftMotor.forward();
-      // rightMotor.forward();
-    }
-    */
+			leftMotor.forward();
+			rightMotor.forward();
 
-    if (stop) {
-      setSpeeds(0, 0);
-    }
-  }
-  
-  /**
-   * Moves robot forward a set distance in cm.
-   * 
-   * @param distance
-   * @param avoid
-   */
-  public static void goForward(double distance, boolean avoid) {
-    double x = odometer.getX() + cos(toRadians(odometer.getTheta())) * distance;
-    double y = odometer.getY() + sin(toRadians(odometer.getTheta())) * distance;
+			double distRemaining = distRemaining(Math.abs(currentX - x), Math.abs(currentY - y));
+			int rotation = convertDistance(distRemaining);
+			leftMotor.rotate(rotation, true);
+			rightMotor.rotate(rotation, false);
 
-    travelTo(x, y, avoid);
-  }
-  
-  /**
-   * Converts input distance to the total rotation of each wheel needed to cover that distance.
-   * 
-   * @param distance
-   * @return the wheel rotations necessary to cover the distance
-   */
-  public static int convertDistance(double distance) {
-    return (int) ((180.0 * distance) / (Math.PI * WHEEL_RADIUS));
-  }
+			while (!isDone(x, y)) {
+				currentX = odometer.getXYT()[0];
+				currentY = odometer.getXYT()[1];
 
-  /**
-   * Converts input angle to the total rotation of each wheel needed to rotate the robot by that
-   * angle.
-   * 
-   * @param angle
-   * @return the wheel rotations necessary to rotate the robot by the angle
-   */
-  public static int convertAngle(double angle) {
-    return convertDistance(Math.PI * TRACK * angle / 360.0);
-  }
+				usSensor.fetchSample(usValues, 0); // from wall following lab
+
+				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
+				// check if safe distance from a block
+				if (distanceCheck < BAND_WIDTH) {
+					obstacleAvoidance();
+					break;
+				}
+			}
+		}
+	}
+
+	private static void obstacleAvoidance() {
+		// TODO Auto-generated method stub
+		rightMotor.setSpeed(ROTATE_SPEED);
+		leftMotor.setSpeed(ROTATE_SPEED);
+
+		// if wall turn 90 deg
+		rightMotor.rotate(-90, true);
+		leftMotor.rotate(90, false);
+
+		rightMotor.forward();
+		leftMotor.forward();
+
+		// then go straight
+		rightMotor.rotate(convertDistance(2*ROBOT_LENGTH));
+		leftMotor.rotate(convertDistance(2*ROBOT_LENGTH));
+
+		// when no wall 90 deg back
+		rightMotor.rotate(90, true);
+		leftMotor.rotate(-90, false);
+
+		rightMotor.forward();
+		leftMotor.forward();
+	}
+
+	/**
+	 * Turns robot towards the indicated angle.
+	 * 
+	 * @param angle
+	 * @param stop controls whether or not to stop the motors when the turn is completed
+	 */
+	public static void turnTo(double angle) {
+		double currentT = odometer.getXYT()[2];
+		if( currentT < 0.0 ) {
+			currentT += 360.0;
+		}
+		double error = angle - currentT;
+		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
+
+		if (abs(error) > DEG_ERR) {
+			if (error > 180.0) {
+				leftMotor.rotate(-convertAngle(error), true);
+				rightMotor.rotate(convertAngle(error), false);
+			} else if (error < -180.0) {
+				leftMotor.rotate(convertAngle(error), true);
+				rightMotor.rotate(-convertAngle(error), false);
+			} else if (error > 0.0) {
+				leftMotor.rotate(convertAngle(error), true);
+				rightMotor.rotate(-convertAngle(error), false);
+			} else if (error < 0.0) {
+				leftMotor.rotate(-convertAngle(error), true);
+				rightMotor.rotate(convertAngle(error), false);
+			}
+		}
+
+		// setSpeeds(0, 0);
+	}
+
+
+	/**
+	 * Dist remaining to point
+	 * 
+	 * @param x
+	 * @param y
+	 * @return dist
+	 */
+	public static double distRemaining(double x, double y) {
+		return(Math.hypot(x, y));
+	}
+
+	/**
+	 * Returns the destination angle.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return the destination angle.
+	 */
+	public static double getDestAngle(double x, double y) {
+		double minAng = (atan2(y - odometer.getXYT()[1], x - odometer.getXYT()[0])) * (180.0 / PI);
+		if (minAng < 0) {
+			minAng += 360.0;
+		}
+		return minAng;
+	}
+
+	/**
+	 * Returns {@code true} when done.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return {@code true} when done.
+	 */
+	public static boolean isDone(double x, double y) {
+		double error = Math.sqrt(Math.pow((odometer.getXYT()[0] - x), 2) + Math.pow((odometer.getXYT()[1] - y), 2));
+		return error < CM_ERR;
+	}
+
+
+	/**
+	 * Converts input distance to the total rotation of each wheel needed to cover that distance.
+	 * 
+	 * @param distance
+	 * @return the wheel rotations necessary to cover the distance
+	 */
+	public static int convertDistance(double distance) {
+		return (int) ((180.0 * distance) / (Math.PI * WHEEL_RAD));
+	}
+
+	/**
+	 * Converts input angle to the total rotation of each wheel needed to rotate the robot by that
+	 * angle.
+	 * 
+	 * @param angle
+	 * @return the wheel rotations necessary to rotate the robot by the angle
+	 */
+	public static int convertAngle(double angle) {
+		return convertDistance(Math.PI * TRACK * angle / 360.0);
+	}
+
+	/**
+	 * Sets the motor speeds jointly.
+	 */
+	public static void setSpeeds(float leftSpeed, float rightSpeed) {
+		leftMotor.setSpeed(leftSpeed);
+		rightMotor.setSpeed(rightSpeed);
+		if (leftSpeed < 0) {
+			leftMotor.backward();
+		} else {
+			leftMotor.forward();
+		}
+		if (rightSpeed < 0) {
+			rightMotor.backward();
+		} else {
+			rightMotor.forward();
+		}
+	}
+
+
 }
