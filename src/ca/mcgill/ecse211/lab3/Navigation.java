@@ -45,17 +45,30 @@ public class Navigation implements Runnable {
 			// get coordinates
 			currentX = odometer.getXYT()[0];
 			currentY = odometer.getXYT()[1];
-			deltaX = x-currentX;
-			deltaY = y-currentY;
-			minAng = Math.atan2(deltaX, deltaY); // determine angle need to turn to
+			deltaX = x - currentX;
+			deltaY = y - currentY;
+			minAng = Math.atan2(deltaX, deltaY) * (180.0 / Math.PI); // determine angle need to turn to
+			
+			if (minAng < 0.0) {
+			  minAng += 360.0;
+			}
+			
+			/*
+			// because arctan is quirky, need to update values based on quadrant
+			// anything left of y-axis should have a negative minAng (from 0 to -180)
+			// anything right of y-axis should have a positive minAng (from 0 to +180)
+			if (deltaX > 0.0 && deltaY < 0.0) {
+			  minAng += 180.0;
+			} else if (deltaX < 0.0 && deltaY < 0.0) {
+			  minAng += 180.0;
+			}
+			*/
+			
 			// turn to
 			turnTo(minAng, x, y); // turn to this angle
 
 			// set speeds
-			leftMotor.setSpeed(ROTATE_SPEED);
-			rightMotor.setSpeed(ROTATE_SPEED);
-			leftMotor.forward();
-			rightMotor.forward();
+			setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
 
 			// distance remaining to point
 			double distRemaining = distRemaining(deltaX, deltaY);
@@ -111,10 +124,11 @@ public class Navigation implements Runnable {
 	 * @param stop controls whether or not to stop the motors when the turn is completed
 	 */
 	public static void turnTo(double angle, double x, double y) {
-		double deltaX = odometer.getXYT()[0] - x;
-		double deltaY = odometer.getXYT()[1] - y;
-		double goTo;
+		// double deltaX = odometer.getXYT()[0] - x;
+		// double deltaY = odometer.getXYT()[1] - y;
+		// double goTo;
 		
+	    /*
 		// if going to smaller x and smaller y
 		if(deltaX < 0.0 && deltaY < 0.0) {
 			goTo = 180 + angle;
@@ -130,7 +144,27 @@ public class Navigation implements Runnable {
 		// if going to bigger x and smaller y
 		
 		// if going to bigger or same x and bigger y
-		
+		*/
+	    
+	    double theta = odometer.getXYT()[2];
+	    double error = angle - theta;
+	    
+	    // TODO: perform turns depending on error
+	    // already have angle corrected for the quadrant
+	    while (abs(error) > DEG_ERR) {
+	      if (error > 180.0) {
+	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
+	      } else if (error < -180.0) {
+	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
+	      } else if (error > 0.0) {
+	        setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
+	      } else {
+	        setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
+	      }
+	      
+	      theta = odometer.getXYT()[2];
+	      error = angle - theta;
+	    }
 	}
 
 	
@@ -214,23 +248,23 @@ public class Navigation implements Runnable {
 		return convertDistance(Math.PI * TRACK * angle / 360.0);
 	}
 
-	//	/**
-	//	 * Sets the motor speeds jointly.
-	//	 */
-	//	public static void setSpeeds(float leftSpeed, float rightSpeed) {
-	//		leftMotor.setSpeed(leftSpeed);
-	//		rightMotor.setSpeed(rightSpeed);
-	//		if (leftSpeed < 0) {
-	//			leftMotor.backward();
-	//		} else {
-	//			leftMotor.forward();
-	//		}
-	//		if (rightSpeed < 0) {
-	//			rightMotor.backward();
-	//		} else {
-	//			rightMotor.forward();
-	//		}
-	//	}
+	/**
+	 * Sets the motor speeds jointly.
+	 */
+	public static void setSpeeds(float leftSpeed, float rightSpeed) {
+		leftMotor.setSpeed(leftSpeed);
+		rightMotor.setSpeed(rightSpeed);
+		if (leftSpeed < 0) {
+			leftMotor.backward();
+		} else {
+			leftMotor.forward();
+		}
+		if (rightSpeed < 0) {
+			rightMotor.backward();
+		} else {
+			rightMotor.forward();
+		}
+	}
 
 
 }

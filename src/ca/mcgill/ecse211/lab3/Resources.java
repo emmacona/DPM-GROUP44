@@ -43,12 +43,12 @@ public class Resources {
 	/**
 	 * The speed at which the robot moves forward in degrees per second.
 	 */
-	public static final int FORWARD_SPEED = 250;
+	public static final int FORWARD_SPEED = 200;
 
 	/**
 	 * The speed at which the robot rotates in degrees per second.
 	 */
-	public static final int ROTATE_SPEED = 150;
+	public static final int ROTATE_SPEED = 100;
 
 	/**
 	 * The motor acceleration in degrees per second squared.
@@ -68,7 +68,7 @@ public class Resources {
 	/**
 	 * The degree error.
 	 */
-	public static final double DEG_ERR = 2.0;
+	public static final double DEG_ERR = 1.0;
 
 	/**
 	 * The cm error.
