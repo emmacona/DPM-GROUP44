@@ -1,4 +1,3 @@
-// Lab2.java
 package ca.mcgill.ecse211.lab3;
 
 import lejos.hardware.Button;
@@ -7,7 +6,7 @@ import lejos.hardware.Button;
 import static ca.mcgill.ecse211.lab3.Resources.*;
 
 /**
- * The main driver class for the odometry lab.
+ * The main driver class for the navigation lab.
  */
 public class Main {
 
@@ -17,9 +16,9 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		//start the threads
 		new Thread(odometer).start();
 		new Thread(navig).start();
-		
 		new Thread(new Display()).start();
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE) {

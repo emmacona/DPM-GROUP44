@@ -88,17 +88,17 @@ public class Resources {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 
 	/**
-	 * The ultrasound sensor.
+	 * The ultrasonic sensor.
 	 */
 	public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
 
 	/**
-	 *TODO
+	 *The ultrasonic mode.
 	 */
 	public static SampleProvider usDistance = usSensor.getMode("Distance");
 
 	/**
-	 * TODO
+	 * The ultrasonic reading.
 	 */
 	public static float[] usValues = new float[usDistance.sampleSize()];
 	
