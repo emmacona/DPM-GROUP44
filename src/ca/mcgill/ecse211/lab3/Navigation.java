@@ -87,26 +87,29 @@ public class Navigation implements Runnable {
 	 * 
 	 */
 	private static void obstacleAvoidance() {
-		rightMotor.setSpeed(FORWARD_SPEED);
-		leftMotor.setSpeed(FORWARD_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
+		leftMotor.setSpeed(ROTATE_SPEED);
 
 		// if wall turn 90 deg
-		rightMotor.rotate(-90, true);
-		leftMotor.rotate(90, false);
+		rightMotor.rotate(-convertAngle(90), true);
+		leftMotor.rotate(convertAngle(90), false);
 		rightMotor.forward();
 		leftMotor.forward();
 
 		// then go straight for a bit
-		rightMotor.rotate(convertDistance(TILE_SIZE));
-		leftMotor.rotate(convertDistance(TILE_SIZE));
+		rightMotor.rotate(convertDistance(TILE_SIZE), true);
+		leftMotor.rotate(convertDistance(TILE_SIZE), false);
 		rightMotor.forward();
 		leftMotor.forward();
 		
 		// when no wall 90 deg back
-		rightMotor.rotate(90, true);
-		leftMotor.rotate(-90, false);
+		rightMotor.rotate(convertAngle(90), true);
+		leftMotor.rotate(-convertAngle(90), false);
 		rightMotor.forward();
 		leftMotor.forward();
+		
+		rightMotor.rotate(convertDistance(TILE_SIZE));
+		leftMotor.rotate(convertDistance(TILE_SIZE));
 	}
 
 	/**
