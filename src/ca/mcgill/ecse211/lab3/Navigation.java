@@ -97,9 +97,11 @@ public class Navigation implements Runnable {
 		leftMotor.forward();
 
 		// then go straight for a bit
-		rightMotor.rotate(convertDistance(2*ROBOT_LENGTH));
-		leftMotor.rotate(convertDistance(2*ROBOT_LENGTH));
-
+		rightMotor.rotate(convertDistance(TILE_SIZE));
+		leftMotor.rotate(convertDistance(TILE_SIZE));
+		rightMotor.forward();
+		leftMotor.forward();
+		
 		// when no wall 90 deg back
 		rightMotor.rotate(90, true);
 		leftMotor.rotate(-90, false);
