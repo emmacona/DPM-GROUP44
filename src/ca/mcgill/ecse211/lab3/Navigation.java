@@ -24,7 +24,8 @@ public class Navigation implements Runnable {
 			// since starts at (1, 1), only want to travel 2 tile sizes for (1, 3)
 			// so need to subtract 1 from all the coordinates
 			travelTo((point[0]-1)*TILE_SIZE, (point[1]-1)*TILE_SIZE);
-		} 
+		}
+		setSpeeds(0, 0);
 	}
 
 	/**
@@ -47,45 +48,38 @@ public class Navigation implements Runnable {
 			currentY = odometer.getXYT()[1];
 			deltaX = x - currentX;
 			deltaY = y - currentY;
-			minAng = Math.atan2(deltaX, deltaY) * (180.0 / Math.PI); // determine angle need to turn to
+			minAng = atan2(deltaX, deltaY) * (180.0 / PI); // determine angle need to turn to
 			
 			if (minAng < 0.0) {
 			  minAng += 360.0;
 			}
-			
-			/*
-			// because arctan is quirky, need to update values based on quadrant
-			// anything left of y-axis should have a negative minAng (from 0 to -180)
-			// anything right of y-axis should have a positive minAng (from 0 to +180)
-			if (deltaX > 0.0 && deltaY < 0.0) {
-			  minAng += 180.0;
-			} else if (deltaX < 0.0 && deltaY < 0.0) {
-			  minAng += 180.0;
-			}
-			*/
 			
 			// turn to
 			turnTo(minAng, x, y); // turn to this angle
 
 			// set speeds
 			setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+			
+			/*
+	        // distance remaining to point
+            double distRemaining = distRemaining(deltaX, deltaY);
+            int rotation = convertDistance(distRemaining);
 
-			// distance remaining to point
-			double distRemaining = distRemaining(deltaX, deltaY);
-			int rotation = convertDistance(distRemaining);
+            leftMotor.rotate(rotation, true);
+            rightMotor.rotate(rotation, false);
+            */
 
-			leftMotor.rotate(rotation, true);
-			rightMotor.rotate(rotation, false);
-
+			// TODO: HANDLE OBSTACLE AVOIDANCE BETTER
 			while (!isDone(x, y)) {
 				currentX = odometer.getXYT()[0];
 				currentY = odometer.getXYT()[1];
 
 				usSensor.fetchSample(usValues, 0); // from wall following lab
 
-				int distanceCheck = (int) (usValues[0] * 100); // to decrease error cm --> *100
+				int distance = (int) (usValues[0] * 100); // to decrease error cm --> *100
 				// check if safe distance from a block
-				if (distanceCheck < BAND_WIDTH) {
+				// int distance = usPoller.getDistance();
+				if (distance < AVOIDANCE_DISTANCE) {
 					obstacleAvoidance();
 					break;
 				}

@@ -16,19 +16,19 @@ import lejos.robotics.SampleProvider;
  */
 public class Resources {
 	/**
-	 * The wheel radius in centimeters.
+	 * The robot length in centimeters.
 	 */
 	public static final double ROBOT_LENGTH = 13;
 
 	/**
-	 * The wheel radius in centimeters.
+	 * The distance of the dead band from walls/obstacles in centimeters.
 	 */
-	public static final int BAND_CENTER = 30;
+	public static final int AVOIDANCE_DISTANCE = 10;
 
 	/**
 	 * Width of dead band (cm).
 	 */
-	public static final int BAND_WIDTH = 10;;
+	public static final int EMERGENCY_DISTANCE = 10;;
 
 	/**
 	 * The wheel radius in centimeters.
@@ -38,7 +38,7 @@ public class Resources {
 	/**
 	 * The robot width in centimeters.
 	 */
-	public static final double TRACK = 11.5;
+	public static final double TRACK = 11.25;
 
 	/**
 	 * The speed at which the robot moves forward in degrees per second.
@@ -101,6 +101,11 @@ public class Resources {
 	 * TODO
 	 */
 	public static float[] usValues = new float[usDistance.sampleSize()];
+	
+	/**
+	 * The ultrasonic poller.
+	 */
+	public static UltrasonicPoller usPoller = new UltrasonicPoller();
 
 	/**
 	 * The LCD.
