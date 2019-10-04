@@ -11,26 +11,33 @@ import static ca.mcgill.ecse211.lab4.Resources.*;
  * one cycle through the loop is approximately 70 ms. This corresponds to a sampling rate of 1/70ms
  * or about 14 Hz.
  */
+
 public class UltrasonicPoller implements Runnable {
-  private float[] usData = new float[usSensor.sampleSize()];
-  int distance;
 
-  // Sensors now return floats using a uniform protocol.
-  // Need to convert US result to an integer [0,255]
+	private UltrasonicLocalizer usLocalizer;
+	private float[] usData;
 
-  public void run() {
-    while (true) {
-      usSensor.fetchSample(usData, 0); // acquire data
-      distance = (int) (usData[0] * 100.0); // extract from buffer, convert to cm, cast to int
+	public UltrasonicPoller() {
+		usData = new float[usSensor.sampleSize()];
+	}
 
-      //Log.log(Log.Sender.usSensor, Integer.toString(distance));
-
-      Main.sleepFor(50);
-    }
-  }
-
-  public int getDistance() {
-    return distance;
-  }
+	/*
+	 * Sensors now return floats using a uniform protocol. Need to convert US result to an integer
+	 * [0,255] (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
+	public void run() {
+		int distance;
+		while (true) {
+			usSensor.getDistanceMode().fetchSample(usData, 0); // acquire distance data in meters
+			distance = (int) (usData[0] * 100.0); // extract from buffer, convert to cm, cast to int
+			usLocalizer.processUSData(distance); // now take action depending on value
+			try {
+				Thread.sleep(50);
+			} catch (Exception e) {
+			} // Poor man's timed sampling
+		}
+	}
 
 }

@@ -26,6 +26,12 @@ public class Resources {
 	 * The robot width in centimeters.
 	 */
 	public static final double TRACK = 12.25;
+	
+	/**
+	 * The distance between light sensor and wheels
+	 */
+	public static final double LIGHT_TO_WHEEL = 3.0;
+
 
 	/**
 	 * The speed at which the robot moves forward in degrees per second.
@@ -51,6 +57,16 @@ public class Resources {
 	 * The tile size in centimeters.
 	 */
 	public static final double TILE_SIZE = 30.48;
+	
+	/**
+	 * The degree error allowed.
+	 */
+	public static final double DEG_ERR = 3.0;
+	
+	/**
+	 * The filter.
+	 */
+	public static final int FILTER_OUT = 25;
 
 	/**
 	 * The left motor.
@@ -65,9 +81,9 @@ public class Resources {
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 
 	/**
-	 * The color sensor.
+	 * The light sensor.
 	 */
-	public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+	public static final EV3ColorSensor lightSensor = new EV3ColorSensor(SensorPort.S1);
 
 
 	/**
@@ -89,6 +105,12 @@ public class Resources {
 	 * The ultrasonic poller.
 	 */
 	public static UltrasonicPoller usPoller = new UltrasonicPoller();
+	
+	/**
+	 * The ultrasonic localizer.
+	 */
+	public static UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(null);
+	
 
 	/**
 	 * The LCD.
