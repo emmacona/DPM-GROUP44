@@ -1,6 +1,6 @@
 package ca.mcgill.ecse211.lab4;
 
-import ca.mcgill.ecse211.lab3.UltrasonicPoller;
+import ca.mcgill.ecse211.lab4.UltrasonicPoller;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -30,18 +30,18 @@ public class Resources {
 	/**
 	 * The distance between light sensor and wheels
 	 */
-	public static final double LIGHT_TO_WHEEL = 3.0;
+	public static final double LIGHT_TO_WHEEL = 4.5;
 
 
 	/**
 	 * The speed at which the robot moves forward in degrees per second.
 	 */
-	public static final int FORWARD_SPEED = 250;
+	public static final int FORWARD_SPEED = 100;
 
 	/**
 	 * The speed at which the robot rotates in degrees per second.
 	 */
-	public static final int ROTATE_SPEED = 150;
+	public static final int ROTATE_SPEED = 50;
 
 	/**
 	 * The motor acceleration in degrees per second squared.
@@ -66,7 +66,7 @@ public class Resources {
 	/**
 	 * The filter.
 	 */
-	public static final int FILTER_OUT = 25;
+	public static final int FILTER_OUT = 5;
 
 	/**
 	 * The left motor.
@@ -83,7 +83,7 @@ public class Resources {
 	/**
 	 * The light sensor.
 	 */
-	public static final EV3ColorSensor lightSensor = new EV3ColorSensor(SensorPort.S1);
+	public static final EV3ColorSensor lightSensor = new EV3ColorSensor(SensorPort.S4);
 
 
 	/**

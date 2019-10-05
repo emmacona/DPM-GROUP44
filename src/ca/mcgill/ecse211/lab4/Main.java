@@ -8,7 +8,7 @@ import lejos.hardware.sensor.SensorModes;
 // static import to avoid duplicating variables and make the code easier to read
 import static ca.mcgill.ecse211.lab4.Resources.*;
 
-import ca.mcgill.ecse211.lab1.UltrasonicPoller;
+import ca.mcgill.ecse211.lab4.UltrasonicPoller;
 
 /**
  * The main driver class for the navigation lab.
@@ -40,24 +40,31 @@ public class Main {
 		} while (buttonChoice != Button.ID_LEFT
 				&& buttonChoice != Button.ID_RIGHT);
 
-		UltrasonicLocalizer usLocalizer;
-		UltrasonicPoller usPoller = new UltrasonicPoller();
-		//not sure if should be threads
-		new Thread(new UltrasonicPoller()).start();
-		new Thread(odometer).start();
+		// UltrasonicLocalizer usLocalizer;
+		// UltrasonicPoller usPoller = new UltrasonicPoller();
+		// not sure if should be threads
 		new Thread(usPoller).start();
+		new Thread(odometer).start();
+		new Thread(new Display()).start();
+		//new Thread(usPoller).start();
 
 	    if (buttonChoice == Button.ID_LEFT) {
-	    	usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
+	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
+	        new Thread(usLocalizer).start();
+	    	// new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE)).start();
+	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
 	    } else {
-	    	usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
+	    	new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE)).start();
+	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
 	    }
+	    
 
 		Button.waitForAnyPress();
 
-		LightLocalizer lightLocalizer = new LightLocalizer();
+		// TODO: get light localization working; currently it throws some exceptions
+		// LightLocalizer lightLocalizer = new LightLocalizer();
 		//not sure if should be threads
-		new Thread(lightLocalizer).start();
+		// new Thread(lightLocalizer).start();
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	

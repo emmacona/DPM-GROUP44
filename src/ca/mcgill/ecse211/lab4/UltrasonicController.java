@@ -1,6 +1,6 @@
 package ca.mcgill.ecse211.lab4;
 
-import static ca.mcgill.ecse211.lab1.Resources.*;
+import static ca.mcgill.ecse211.lab4.Resources.*;
 
 /*
  * FROM LAB 1

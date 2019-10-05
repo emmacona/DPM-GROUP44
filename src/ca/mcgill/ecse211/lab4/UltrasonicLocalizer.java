@@ -5,19 +5,21 @@ import static java.lang.Math.abs;
 
 import lejos.hardware.Sound;
 
-public class UltrasonicLocalizer {
+public class UltrasonicLocalizer implements Runnable {
 
 
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE }
 	private LocalizationType type;
-	private static Odometer odometer;
+	// private static Odometer odometer;
 	private static int filterControl = 0;
 	public static int distance;
 
 	// Constants
 	//TODO Test for optimal d and k values -- see tutorial slides
-	private static int d = 40; 
-	private static int k = 1;	
+	private static int d = 30; 
+	private static int k = 1;
+	private static int d_rising = 30;
+	private static int k_rising = 1;
 
 	/**
 	 * Constructor
@@ -54,32 +56,63 @@ public class UltrasonicLocalizer {
 	 *  Falling edge method.
 	 */
 	private static void fallingEdge() {
-		// TODO CHANGE THIS A LOT
-
-		// avoid finding falling edge too early
-		leftMotor.rotate(convertAngle(45), true);
-		rightMotor.rotate(-convertAngle(45), false);
-
-		// rotate clockwise
-		leftMotor.forward();
-		rightMotor.backward();
-
-		// keep turning until wall drops away
-		while (distance >= d - k) {
+	    // constants used for the angles of the falling edges
+	    double alpha_initial, alpha_final, alpha_avg;
+	    double beta_initial, beta_final, beta_avg;
+	    
+	    // constant for the difference between alpha and beta
+	    double deltaTheta;
+	  
+        // set speeds
+        leftMotor.setSpeed(ROTATE_SPEED);
+        rightMotor.setSpeed(ROTATE_SPEED);
+        
+        // give the us poller the chance to get a few reading in for filter purposes
+        try {
+          Thread.sleep(250);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+	  
+	    // check if too close at beginning
+	    // if too close, turn until distance is high again
+	    while (distance <= d + k) {
+	       leftMotor.rotate(convertAngle(45), true);
+	       rightMotor.rotate(-convertAngle(45), false);
+	    }
+	    
+		// check for when entering noise margin
+		while (distance > d + k) {
 			//keep turning
+		    leftMotor.forward();
+		    rightMotor.backward();
 		}
+		
+		// used for computing the angle of the falling edge
+		alpha_initial = odometer.getXYT()[2];
+		
+		// check for when exiting noise margin; this means it's a falling edge!
+		while (distance > d - k) {
+		    // keep turning
+		    leftMotor.forward();
+		    rightMotor.backward();
+		}
+		
+		// used for computing the angle of the falling edge
+		alpha_final = odometer.getXYT()[2];
+		
+		// TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
+		// angle of the falling edge
+		alpha_avg = (alpha_initial + alpha_final) / 2.0;
 
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
+		leftMotor.stop(true);
+		rightMotor.stop(false);
 		Sound.beep();
-
-		// start counting change in angle
-		odometer.setTheta(0);
 
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
-		// avoid finding falling edge too early
+		// other falling edge is definitely not going to be within 45 degrees
 		leftMotor.rotate(-convertAngle(45), true);
 		rightMotor.rotate(convertAngle(45), false);
 
@@ -87,24 +120,49 @@ public class UltrasonicLocalizer {
 		leftMotor.backward();
 		rightMotor.forward();
 
-		while (distance >= d - k) {
-			// keep turning
-		}
+        // check for when entering noise margin
+        while (distance > d + k) {
+            //keep turning
+            leftMotor.backward();
+            rightMotor.forward();
+        }
+        
+        // used for computing the angle of the falling edge
+        beta_initial = odometer.getXYT()[2];
+        
+        // check for when exiting noise margin; this means it's a falling edge!
+        while (distance > d - k) {
+            // keep turning
+            leftMotor.backward();
+            rightMotor.forward();
+        }
+        
+        // used for computing the angle of the falling edge
+        beta_final = odometer.getXYT()[2];
+        
+        // TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
+        // angle of the falling edge
+        beta_avg = (beta_initial + beta_final) / 2.0;
 
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
+		leftMotor.stop(true);
+		rightMotor.stop(false);
 		Sound.beep();
 
-		// record change in angle
-		double deltaT = Math.abs(odometer.getXYT()[2]);
-
+		// found alpha and beta, so turn to set theta to 0, then turn by deltaTheta
+		// after the turn, angle should be correctly localized to 0 degrees
+		odometer.setTheta(0.0);
+		
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
+		
+		// calculate halfway angle between alpha and beta
+		deltaTheta = alpha_avg > beta_avg ? (45.0 - (alpha_avg + beta_avg) / 2.0) : (225.0 - (alpha_avg + beta_avg) / 2.0);
 
-		// turn to minimal angle
-		// TODO test that -- change accordingly, Math.PI could be divided more if falls short
-		turnTo(deltaT/2 - Math.PI/4);
-
+		// make the turn
+		leftMotor.rotate(convertAngle(deltaTheta), true);
+		rightMotor.rotate(-convertAngle(deltaTheta), false);
+		
+		// done!
 		odometer.setTheta(0);
 		Sound.beep();
 
@@ -114,86 +172,115 @@ public class UltrasonicLocalizer {
 	 *  Rising edge method.
 	 */
 	private static void risingEdge() {
-		// TODO CHANGE THIS A LOT
+      // constants used for the angles of the falling edges
+      double alpha_initial, alpha_final, alpha_avg;
+      double beta_initial, beta_final, beta_avg;
+      
+      // constant for the difference between alpha and beta
+      double deltaTheta;
+    
+      // set speeds
+      leftMotor.setSpeed(ROTATE_SPEED);
+      rightMotor.setSpeed(ROTATE_SPEED);
+    
+      // give the us poller the chance to get a few reading in for filter purposes
+      try {
+          Thread.sleep(250);
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+      
+      // check if too far at beginning
+      // if too far, turn until distance is low again
+      while (distance >= d_rising - k_rising) {
+         leftMotor.rotate(convertAngle(45), true);
+         rightMotor.rotate(-convertAngle(45), false);
+      }
+      
+      // check for when entering noise margin
+      while (distance < d_rising - k_rising) {
+          //keep turning
+          leftMotor.forward();
+          rightMotor.backward();
+      }
+      
+      // used for computing the angle of the falling edge
+      alpha_initial = odometer.getXYT()[2];
+      
+      // check for when exiting noise margin; this means it's a falling edge!
+      while (distance < d_rising + k_rising) {
+          // keep turning
+          leftMotor.forward();
+          rightMotor.backward();
+      }
+      
+      // used for computing the angle of the falling edge
+      alpha_final = odometer.getXYT()[2];
+      
+      // TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
+      // angle of the falling edge
+      alpha_avg = (alpha_initial + alpha_final) / 2.0;
 
-		// avoid finding rising edge too early
-		leftMotor.rotate(convertAngle(45), true);
-		rightMotor.rotate(-convertAngle(45), false);
+      leftMotor.stop(true);
+      rightMotor.stop(false);
+      Sound.beep();
 
-		// rotate clockwise
-		leftMotor.forward();
-		rightMotor.backward();
+      leftMotor.setSpeed(ROTATE_SPEED);
+      rightMotor.setSpeed(ROTATE_SPEED);
 
-		// keep turning until wall drops away
-		while (distance <= d + k) {
-			//keep turning
-		}
+      // other rising edge is definitely not going be within 45 degrees
+      leftMotor.rotate(-convertAngle(45), true);
+      rightMotor.rotate(convertAngle(45), false);
 
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
-		Sound.beep();
+      // turn counterclockwise until next rising edge
+      leftMotor.backward();
+      rightMotor.forward();
 
-		// start counting change in angle
-		odometer.setTheta(0);
+      // check for when entering noise margin
+      while (distance < d_rising - k_rising) {
+          //keep turning
+          leftMotor.backward();
+          rightMotor.forward();
+      }
+      
+      // used for computing the angle of the falling edge
+      beta_initial = odometer.getXYT()[2];
+      
+      // check for when exiting noise margin; this means it's a falling edge!
+      while (distance < d_rising + k_rising) {
+          // keep turning
+          leftMotor.backward();
+          rightMotor.forward();
+      }
+      
+      // used for computing the angle of the falling edge
+      beta_final = odometer.getXYT()[2];
+      
+      // TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
+      // angle of the falling edge
+      beta_avg = (beta_initial + beta_final) / 2.0;
 
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
+      leftMotor.stop(true);
+      rightMotor.stop(false);
+      Sound.beep();
 
-		// avoid finding rising edge too early
-		leftMotor.rotate(-convertAngle(45), true);
-		rightMotor.rotate(convertAngle(45), false);
+      // found alpha and beta, so turn to set theta to 0, then turn by deltaTheta
+      // after the turn, angle should be correctly localized to 0 degrees
+      odometer.setTheta(0.0);
+      
+      leftMotor.setSpeed(ROTATE_SPEED);
+      rightMotor.setSpeed(ROTATE_SPEED);
+      
+      // calculate halfway angle between alpha and beta
+      deltaTheta = alpha_avg < beta_avg ? (135.0 - (alpha_avg + beta_avg) / 2.0) : (405.0 - (alpha_avg + beta_avg) / 2.0);
 
-		// turn counterclockwise until next rising edge
-		leftMotor.backward();
-		rightMotor.forward();
-
-		while (distance <= d + k) {
-			// keep turning
-		}
-
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
-		Sound.beep();
-
-		// record change in angle
-		double deltaT = Math.abs(odometer.getXYT()[2]);
-
-		leftMotor.setSpeed(ROTATE_SPEED);
-		rightMotor.setSpeed(ROTATE_SPEED);
-
-		// turn to minimal angle
-		// TODO test  and change
-		turnTo(-(5*Math.PI/4 - deltaT/2));
-
-		odometer.setTheta(0);
-		Sound.beep();
-	}
-
-
-	/**
-	 * Turns robot towards the indicated angle.
-	 * 
-	 * @param angle
-	 * @param x, the goal x location
-	 * @param y, the goal y location
-	 */
-	public static void turnTo(double angle) {
-		double theta = odometer.getXYT()[2]; // Get current theta reading
-		double error = angle - theta; // Calculate what's left to get to the wanted angle
-
-		while (abs(error) > DEG_ERR) { // while we are not close enough to goal angle
-			if (error > 180.0) { // if bigger than 180, turn right
-				setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
-			} else if (error < -180.0) { // if smaller than negative 180, turn left
-				setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
-			} else if (error > 0.0) { // if bigger than 0, turn left
-				setSpeeds(ROTATE_SPEED, -ROTATE_SPEED);
-			} else { // if smaller than 0, turn right
-				setSpeeds(-ROTATE_SPEED, ROTATE_SPEED);
-			}
-			theta = odometer.getXYT()[2]; // update current theta reading
-			error = angle - theta; // update error
-		}
+      // make the turn
+      leftMotor.rotate(convertAngle(deltaTheta), true);
+      rightMotor.rotate(-convertAngle(deltaTheta), false);
+      
+      // done!
+      odometer.setTheta(0);
+      Sound.beep();
 	}
 
 	/**
@@ -263,6 +350,15 @@ public class UltrasonicLocalizer {
 	 */
 	public int readUSDistance() {
 		return UltrasonicLocalizer.distance;
+	}
+	
+	/**
+	 * 
+	 * @param type RISING_EDGE or FALLING_EDGE
+	 */
+	public void setType(LocalizationType type) {
+	    this.type = type;
+	    return;
 	}
 
 }

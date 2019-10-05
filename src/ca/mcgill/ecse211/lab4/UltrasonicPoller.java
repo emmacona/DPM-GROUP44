@@ -14,11 +14,12 @@ import static ca.mcgill.ecse211.lab4.Resources.*;
 
 public class UltrasonicPoller implements Runnable {
 
-	private UltrasonicLocalizer usLocalizer;
+	// private UltrasonicLocalizer usLocalizer;
 	private float[] usData;
 
 	public UltrasonicPoller() {
-		usData = new float[usSensor.sampleSize()];
+		// usData = new float[usSensor.sampleSize()];
+	    usData = new float[usDistance.sampleSize()];
 	}
 
 	/*
