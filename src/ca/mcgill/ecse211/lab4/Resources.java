@@ -25,7 +25,7 @@ public class Resources {
 	/**
 	 * The robot width in centimeters.
 	 */
-	public static final double TRACK = 12.25;
+	public static final double TRACK = 11.5;
 	
 	/**
 	 * The distance between light sensor and wheels
@@ -111,6 +111,10 @@ public class Resources {
 	 */
 	public static UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(null);
 	
+	/**
+	 * The light localizer.
+	 */
+	public static LightLocalizer lightLocalizer = new LightLocalizer();
 
 	/**
 	 * The LCD.

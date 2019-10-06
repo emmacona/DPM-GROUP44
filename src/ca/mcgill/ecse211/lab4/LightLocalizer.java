@@ -6,12 +6,14 @@ import lejos.robotics.SampleProvider;
 
 public class LightLocalizer implements Runnable {
 
-	SampleProvider colSample = lightSensor.getMode("White"); // TODO test other colors
-	float[] colorData = new float[colSample.sampleSize()];	
+	SampleProvider colSample = lightSensor.getMode("Red"); // TODO test other colors
+	float[] colorData = new float[colSample.sampleSize()];
+	int lightDifferential = 30;    // TUNE THIS
 
 	public void run() {
-		// TODO Auto-generated method stub
-
+	    float oldReading = 0;
+	    float newReading = 0;
+	  
 		// assumptions:
 		// light sensor is in front of wheels by distance f
 		// starting oriented at 0deg somewhere in bottom left square
@@ -30,24 +32,29 @@ public class LightLocalizer implements Runnable {
 
 		// get light value
 		colSample.fetchSample(colorData, 0);
-		float reading = colorData[0] * 1000;		// scale up for more accuracy
-		Display.showText("Color: " + reading);
+		oldReading = colorData[0] * 1000;
+		newReading = colorData[0] * 1000;		// scale up for more accuracy
 
-		while (reading >= 550) { // black line
+		while (true) { // black line
 			// update light value
 			colSample.fetchSample(colorData, 0);
-			reading = colorData[0] * 1000;		// scale up for more accuracy
-			Display.showText("Color: " + reading);
+			newReading = colorData[0] * 1000;		// scale up for more accuracy
+			
+			// keep going forward until cross black line
+			if (oldReading - newReading > lightDifferential) {
+			  oldReading = newReading;
+			  break;
+			}
+			oldReading = newReading;
 		}
 
-
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
+		leftMotor.stop(true);
+		rightMotor.stop(false);
 
 		Sound.beep();
 
-		leftMotor.setSpeed(FORWARD_SPEED);
-		rightMotor.setSpeed(FORWARD_SPEED);
+		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
 
 		// turn 90deg clockwise
 		leftMotor.rotate(convertAngle(90), true);
@@ -59,21 +66,29 @@ public class LightLocalizer implements Runnable {
 		// move forward until a line is detected, stop
 		// get light value
 		colSample.fetchSample(colorData, 0);
-		reading = colorData[0] * 1000;		// scale up for more accuracy
-		Display.showText("Color: " + reading);
+		newReading = colorData[0] * 1000;		// scale up for more accuracy
+		oldReading = colorData[0] * 1000;
 
-		while (reading >= 550) {
+		while (true) {
 			// update light value
 			colSample.fetchSample(colorData, 0);
-			reading = colorData[0] * 1000;		// scale up for more accuracy
-			Display.showText("Color: " + reading);
+			newReading = colorData[0] * 1000;		// scale up for more accuracy
+			
+	        // keep going forward until cross black line
+            if (oldReading - newReading > lightDifferential) {
+              oldReading = newReading;
+              break;
+            }
+            oldReading = newReading;
 		}
 
-		leftMotor.setSpeed(0);
-		rightMotor.setSpeed(0);
+		leftMotor.stop(true);
+		rightMotor.stop(false);
+		
 		Sound.beep();
-		leftMotor.setSpeed(FORWARD_SPEED);
-		rightMotor.setSpeed(FORWARD_SPEED);
+		
+		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
 
 		// move LIGHT_TO_WHEEL cm forward
 		leftMotor.rotate(convertDistance(LIGHT_TO_WHEEL), true);
@@ -86,6 +101,9 @@ public class LightLocalizer implements Runnable {
 		// move f cm forward
 		leftMotor.rotate(convertDistance(LIGHT_TO_WHEEL), true);
 		rightMotor.rotate(convertDistance(LIGHT_TO_WHEEL), false);
+		
+		// TODO: ORIENT ANGLE USING LIGHT SENSOR
+		// Once at (0,0), have the final counter-clockwise rotation stop at black line
 
 		// done => zero odometer values
 		odometer.setX(0);

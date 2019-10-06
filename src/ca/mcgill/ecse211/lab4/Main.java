@@ -40,31 +40,37 @@ public class Main {
 		} while (buttonChoice != Button.ID_LEFT
 				&& buttonChoice != Button.ID_RIGHT);
 
-		// UltrasonicLocalizer usLocalizer;
-		// UltrasonicPoller usPoller = new UltrasonicPoller();
-		// not sure if should be threads
-		new Thread(usPoller).start();
-		new Thread(odometer).start();
-		new Thread(new Display()).start();
-		//new Thread(usPoller).start();
+		Thread usPollerThread = new Thread(usPoller);
+		usPollerThread.start();
+		Thread odometerThread = new Thread(odometer);
+		odometerThread.start();
+		Thread displayThread = new Thread(new Display());
+		displayThread.start();
 
+		Thread usLocalizerThread = new Thread(usLocalizer);
+		
 	    if (buttonChoice == Button.ID_LEFT) {
 	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
-	        new Thread(usLocalizer).start();
+	        usLocalizerThread.start();
 	    	// new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE)).start();
 	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
 	    } else {
-	    	new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE)).start();
+	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
+	    	usLocalizerThread.start();
+	        // new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE)).start();
 	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
 	    }
 	    
 
 		Button.waitForAnyPress();
+		
+		usPollerThread.interrupt();
+		usLocalizerThread.interrupt();
 
 		// TODO: get light localization working; currently it throws some exceptions
 		// LightLocalizer lightLocalizer = new LightLocalizer();
 		//not sure if should be threads
-		// new Thread(lightLocalizer).start();
+		new Thread(lightLocalizer).start();
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	
