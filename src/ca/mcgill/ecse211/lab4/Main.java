@@ -52,20 +52,16 @@ public class Main {
 	    if (buttonChoice == Button.ID_LEFT) {
 	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
 	        usLocalizerThread.start();
-	    	// new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE)).start();
-	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
 	    } else {
 	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
 	    	usLocalizerThread.start();
-	        // new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE)).start();
-	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
 	    }
 	    
 
 		Button.waitForAnyPress();
 		
-		usPollerThread.interrupt();
-		usLocalizerThread.interrupt();
+//		usPollerThread.interrupt();
+//		usLocalizerThread.interrupt();
 
 		// TODO: get light localization working; currently it throws some exceptions
 		// LightLocalizer lightLocalizer = new LightLocalizer();

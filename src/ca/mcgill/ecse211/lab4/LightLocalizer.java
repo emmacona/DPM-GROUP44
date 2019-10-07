@@ -13,33 +13,27 @@ public class LightLocalizer implements Runnable {
 	public void run() {
 	    float oldReading = 0;
 	    float newReading = 0;
-	  
-		// assumptions:
-		// light sensor is in front of wheels by distance f
-		// starting oriented at 0deg somewhere in bottom left square
-		// i.e. after US localization has happened
 
-		// set speed and acceleration
+		// Set motor speeds
 		leftMotor.setSpeed(FORWARD_SPEED);
 		rightMotor.setSpeed(FORWARD_SPEED);
+		// Set acceleration
 		leftMotor.setAcceleration(ACCELERATION);
 		rightMotor.setAcceleration(ACCELERATION);
 
-
-		// move forward until a line is detected
+		// Make robot move
 		leftMotor.forward();
 		rightMotor.forward();
 
-		// get light value
+		// Get light sensor reading
 		colSample.fetchSample(colorData, 0);
 		oldReading = colorData[0] * 1000;
-		newReading = colorData[0] * 1000;		// scale up for more accuracy
+		newReading = colorData[0] * 1000;		// * 1000 == increases accuracy
 
 		while (true) { // black line
-			// update light value
+			// update light sensor reading
 			colSample.fetchSample(colorData, 0);
-			newReading = colorData[0] * 1000;		// scale up for more accuracy
-			
+			newReading = colorData[0] * 1000;		
 			// keep going forward until cross black line
 			if (oldReading - newReading > lightDifferential) {
 			  oldReading = newReading;
@@ -52,16 +46,18 @@ public class LightLocalizer implements Runnable {
 		rightMotor.stop(false);
 
 		Sound.beep();
-
+		
+		// Set to rotate speed / low 
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
-		// turn 90deg clockwise
+		// Make robot turn to the right
 		leftMotor.rotate(convertAngle(90), true);
 		rightMotor.rotate(-convertAngle(90), false);
-
 		leftMotor.forward();
 		rightMotor.forward();
+		
+		// Now we will do the same procedure but turn the other way
 
 		// move forward until a line is detected, stop
 		// get light value
@@ -70,11 +66,11 @@ public class LightLocalizer implements Runnable {
 		oldReading = colorData[0] * 1000;
 
 		while (true) {
-			// update light value
+			// update light sensor reading
 			colSample.fetchSample(colorData, 0);
-			newReading = colorData[0] * 1000;		// scale up for more accuracy
+			newReading = colorData[0] * 1000;
 			
-	        // keep going forward until cross black line
+	        // keep going forward until cross black line again
             if (oldReading - newReading > lightDifferential) {
               oldReading = newReading;
               break;
@@ -94,11 +90,11 @@ public class LightLocalizer implements Runnable {
 		leftMotor.rotate(convertDistance(LIGHT_TO_WHEEL), true);
 		rightMotor.rotate(convertDistance(LIGHT_TO_WHEEL), false);
 
-		// turn 90deg counterclockwise
+		// turn to left now
 		leftMotor.rotate(-convertAngle(90), true);
 		rightMotor.rotate(convertAngle(90), false);
 
-		// move f cm forward
+		// move LIGHT_TO_WHEEL cm forward
 		leftMotor.rotate(convertDistance(LIGHT_TO_WHEEL), true);
 		rightMotor.rotate(convertDistance(LIGHT_TO_WHEEL), false);
 		

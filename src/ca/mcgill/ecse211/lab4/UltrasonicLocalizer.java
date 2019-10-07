@@ -10,12 +10,10 @@ public class UltrasonicLocalizer implements Runnable {
 
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE }
 	private LocalizationType type;
-	// private static Odometer odometer;
 	private static int filterControl = 0;
 	public static int distance;
 
-	// Constants
-	//TODO Test for optimal d and k values -- see tutorial slides
+	// Class constants
 	private static int d = 30; 
 	private static int k = 1;
 	private static int d_rising = 30;
@@ -30,26 +28,25 @@ public class UltrasonicLocalizer implements Runnable {
 	}
 
 	/**
-	 * TODO
+	 * 
 	 */
 	public void run() {
-		// TODO Auto-generated method stub
 
-		// set speeds of motors to low/rotation speed
+		// Set motor speeds to rotate speed
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
-		// set acceleration 
-		// (prevents acceleration from going too fast by default as has happened in previous lab)
+		// Set acceleration speed
+		// prevents acceleration from going too fast by default as has happened in previous lab
 		leftMotor.setAcceleration(ACCELERATION);
 		rightMotor.setAcceleration(ACCELERATION);
 
-		if (this.type == LocalizationType.RISING_EDGE) {
+		// Check localization type
+		if (this.type == LocalizationType.RISING_EDGE) { // facing a wall
 			risingEdge();
-		} else { // falling edge
+		} else { // falling edge // facing away from wall
 			fallingEdge();
 		}
-
 	}
 
 	/**
