@@ -21,12 +21,12 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		final TextLCD display = LocalEV3.get().getTextLCD();
 
 		int buttonChoice;
 		do {
-			
+
 			display.clear();
 
 			display.drawString("< Left   | Right >", 0, 0);
@@ -36,7 +36,7 @@ public class Main {
 			display.drawString("         |		  ", 0, 4);
 
 			buttonChoice = Button.waitForAnyPress();
-			
+
 		} while (buttonChoice != Button.ID_LEFT
 				&& buttonChoice != Button.ID_RIGHT);
 
@@ -48,28 +48,22 @@ public class Main {
 		displayThread.start();
 
 		Thread usLocalizerThread = new Thread(usLocalizer);
-		
-	    if (buttonChoice == Button.ID_LEFT) {
-	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
-	        usLocalizerThread.start();
-	    	// new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE)).start();
-	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
-	    } else {
-	    	usLocalizer.setType(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
-	    	usLocalizerThread.start();
-	        // new Thread(new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE)).start();
-	        // usLocalizer = new UltrasonicLocalizer(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
-	    }
-	    
+
+		if (buttonChoice == Button.ID_LEFT) {
+			usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
+			usLocalizerThread.start();
+		} else {
+			usLocalizer.setType(UltrasonicLocalizer.LocalizationType.RISING_EDGE);
+			usLocalizerThread.start();
+		}
+
 
 		Button.waitForAnyPress();
-		
+
 		usPollerThread.interrupt();
 		usLocalizerThread.interrupt();
 
-		// TODO: get light localization working; currently it throws some exceptions
-		// LightLocalizer lightLocalizer = new LightLocalizer();
-		//not sure if should be threads
+		LightLocalizer lightLocalizer = new LightLocalizer();
 		new Thread(lightLocalizer).start();
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);

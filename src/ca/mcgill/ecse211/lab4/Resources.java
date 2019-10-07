@@ -61,7 +61,7 @@ public class Resources {
 	/**
 	 * The degree error allowed.
 	 */
-	public static final double DEG_ERR = 3.0;
+	public static final double DEG_ERR = 1.0;
 	
 	/**
 	 * The filter.
