@@ -31,6 +31,7 @@ public class LightLocalizer implements Runnable {
 		newReading = colorData[0] * 1000;		// * 1000 == increases accuracy
 
 		while (true) { // go forward until see a first line
+
 			// update light sensor reading
 			colSample.fetchSample(colorData, 0);
 			newReading = colorData[0] * 1000;		
@@ -58,6 +59,7 @@ public class LightLocalizer implements Runnable {
 		rightMotor.forward();
 		
 		// Now we will do the same procedure but turn the other way
+
 		// move forward until a line is detected, stop
 		// get light value
 		colSample.fetchSample(colorData, 0);

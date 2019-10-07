@@ -49,6 +49,7 @@ public class Main {
 
 		Thread usLocalizerThread = new Thread(usLocalizer);
 
+
 		if (buttonChoice == Button.ID_LEFT) {
 			usLocalizer.setType(UltrasonicLocalizer.LocalizationType.FALLING_EDGE);
 			usLocalizerThread.start();
@@ -62,6 +63,7 @@ public class Main {
 
 		usPollerThread.interrupt();
 		usLocalizerThread.interrupt();
+
 
 		LightLocalizer lightLocalizer = new LightLocalizer();
 		new Thread(lightLocalizer).start();
