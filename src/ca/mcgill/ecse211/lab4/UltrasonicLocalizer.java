@@ -173,7 +173,7 @@ public class UltrasonicLocalizer implements Runnable {
 		rightMotor.setSpeed(ROTATE_SPEED);
 
 		// calculate halfway angle between alpha and beta
-		// Values of 57 and 255 were chosen based on testing
+		// Values of 53 and 245 were chosen based on testing
 		deltaTheta = alpha_avg > beta_avg ? (53.0 - (alpha_avg + beta_avg) / 2.0) : (245.0 - (alpha_avg + beta_avg) / 2.0);
 
 		// turn to delta T
@@ -191,6 +191,7 @@ public class UltrasonicLocalizer implements Runnable {
 
 	/**
 	 *  Rising edge method.
+	 *  
 	 */
 	private static void risingEdge() {
 		// constants used for the angles of the falling edges
@@ -295,6 +296,7 @@ public class UltrasonicLocalizer implements Runnable {
 		rightMotor.setSpeed(ROTATE_SPEED);
 
 		// calculate halfway angle between alpha and beta
+		// values based on testing
 		deltaTheta = alpha_avg < beta_avg ? (55.0 - (alpha_avg + beta_avg) / 2.0) : (235.0 - (alpha_avg + beta_avg) / 2.0);
 
 		// make the turn
