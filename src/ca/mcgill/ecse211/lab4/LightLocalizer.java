@@ -8,7 +8,7 @@ public class LightLocalizer implements Runnable {
 
 	SampleProvider colSample = lightSensor.getMode("Red");
 	float[] colorData = new float[colSample.sampleSize()];
-	int lightDifferential = 45;    // TUNE THIS
+	int lightDifferential = 50;    // TUNE THIS
 
 	public void run() {
 	    float oldReading = 0;
@@ -21,20 +21,21 @@ public class LightLocalizer implements Runnable {
 		leftMotor.setAcceleration(ACCELERATION);
 		rightMotor.setAcceleration(ACCELERATION);
 
-		// Make robot move
-		leftMotor.forward();
-		rightMotor.forward();
-
 		// Get light sensor reading
 		colSample.fetchSample(colorData, 0);
 		oldReading = colorData[0] * 1000;
 		newReading = colorData[0] * 1000;		// * 1000 == increases accuracy
 
 		while (true) { // go forward until see a first line
+			
+			// Make robot move
+			leftMotor.forward();
+			rightMotor.forward();
 
 			// update light sensor reading
 			colSample.fetchSample(colorData, 0);
 			newReading = colorData[0] * 1000;		
+			
 			// keep going forward until cross black line
 			if (oldReading - newReading > lightDifferential) {
 			  oldReading = newReading;
@@ -55,8 +56,7 @@ public class LightLocalizer implements Runnable {
 		// Make robot turn to the right
 		leftMotor.rotate(convertAngle(90), true);
 		rightMotor.rotate(-convertAngle(90), false);
-		leftMotor.forward();
-		rightMotor.forward();
+
 		
 		// Now we will do the same procedure but turn the other way
 
@@ -67,6 +67,10 @@ public class LightLocalizer implements Runnable {
 		oldReading = colorData[0] * 1000;
 
 		while (true) {
+			
+			leftMotor.forward();
+			rightMotor.forward();
+			
 			// update light sensor reading
 			colSample.fetchSample(colorData, 0);
 			newReading = colorData[0] * 1000;
