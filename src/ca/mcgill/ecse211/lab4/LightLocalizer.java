@@ -8,8 +8,19 @@ public class LightLocalizer implements Runnable {
 
 	SampleProvider colSample = lightSensor.getMode("Red");
 	float[] colorData = new float[colSample.sampleSize()];
-	int lightDifferential = 50;    // TUNE THIS
+	int lightDifferential = 43;
 
+	/**
+	 * Light localizer runs from here.
+	 * 
+	 * 	1. Go straight until see black line
+	 * 	2. turn to right (90°)...
+	 * 	3. ...Until see black line again
+	 * 	4. move forward a bit
+	 * 	5. turn left (90°)
+	 *	6. move forward a bit
+	 *	7. set odo to 0 -- DONE.
+	 */
 	public void run() {
 	    float oldReading = 0;
 	    float newReading = 0;
@@ -20,15 +31,10 @@ public class LightLocalizer implements Runnable {
 		// Set acceleration
 		leftMotor.setAcceleration(ACCELERATION);
 		rightMotor.setAcceleration(ACCELERATION);
-
-		// Get light sensor reading
-		colSample.fetchSample(colorData, 0);
-		oldReading = colorData[0] * 1000;
-		newReading = colorData[0] * 1000;		// * 1000 == increases accuracy
-
+		
 		while (true) { // go forward until see a first line
 			
-			// Make robot move
+			// continue to move
 			leftMotor.forward();
 			rightMotor.forward();
 
@@ -42,6 +48,12 @@ public class LightLocalizer implements Runnable {
 			  break;
 			}
 			oldReading = newReading;
+			
+			try {
+				Thread.sleep(500);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		leftMotor.stop(true);
@@ -59,15 +71,15 @@ public class LightLocalizer implements Runnable {
 
 		
 		// Now we will do the same procedure but turn the other way
+		// reset variables
+		oldReading = 0;
+	    newReading = 0;
+		// Set motor speeds
+		leftMotor.setSpeed(FORWARD_SPEED);
+		rightMotor.setSpeed(FORWARD_SPEED);
 
-		// move forward until a line is detected, stop
-		// get light value
-		colSample.fetchSample(colorData, 0);
-		newReading = colorData[0] * 1000;		// scale up for more accuracy
-		oldReading = colorData[0] * 1000;
-
-		while (true) {
-			
+		while (true) { // move forward until black line is detected
+			// move robot forward
 			leftMotor.forward();
 			rightMotor.forward();
 			
@@ -81,12 +93,20 @@ public class LightLocalizer implements Runnable {
               break;
             }
             oldReading = newReading;
+            
+			try {
+				Thread.sleep(500);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		leftMotor.stop(true);
 		rightMotor.stop(false);
 		
 		Sound.beep();
+		
+		// Now, place robot to center of (1,1)
 		
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
@@ -102,9 +122,6 @@ public class LightLocalizer implements Runnable {
 		// move LIGHT_TO_WHEEL cm forward
 		leftMotor.rotate(convertDistance(LIGHT_TO_WHEEL), true);
 		rightMotor.rotate(convertDistance(LIGHT_TO_WHEEL), false);
-		
-		// TODO: ORIENT ANGLE USING LIGHT SENSOR
-		// Once at (0,0), have the final counter-clockwise rotation stop at black line
 
 		leftMotor.stop(true);
 		rightMotor.stop(false);

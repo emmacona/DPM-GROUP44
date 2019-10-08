@@ -3,12 +3,12 @@ package ca.mcgill.ecse211.lab4;
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
-import lejos.hardware.sensor.SensorModes;
+//import lejos.hardware.sensor.SensorModes;
 
 // static import to avoid duplicating variables and make the code easier to read
 import static ca.mcgill.ecse211.lab4.Resources.*;
 
-import ca.mcgill.ecse211.lab4.UltrasonicPoller;
+//import ca.mcgill.ecse211.lab4.UltrasonicPoller;
 
 /**
  * The main driver class for the navigation lab.

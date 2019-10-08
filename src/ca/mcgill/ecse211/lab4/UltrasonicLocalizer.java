@@ -28,7 +28,8 @@ public class UltrasonicLocalizer implements Runnable {
 	}
 
 	/**
-	 * 
+	 * US localizer runs from here.
+	 * Type specified from Main.
 	 */
 	public void run() {
 
@@ -47,26 +48,27 @@ public class UltrasonicLocalizer implements Runnable {
 
 	/**
 	 *  Falling edge method.
+	 *  
+	 * 1. Turn clockwise
+	 * 2. Get alpha
+	 * 	2.1 while distance > (d + k) do nothing
+	 * 	   else get first alpha
+	 * 	2.2 while distance > (d - k) do nothing
+	 * 	   else get 2nd alpha
+	 * 	2.3 Get alpha avg
+	 * 3. Turn counter clockwise
+	 * 4. Get beta
+	 * 	4.1 while distance > (d + k) do nothing
+	 * 	   else get first alpha
+	 * 	4.2 while distance > (d - k) do nothing
+	 * 	   else get 2nd alpha
+	 * 	4.3 Get beta avg
+	 * 5. Calculate delta angle
+	 * 6. Add delta angle to odo reading
+
 	 */
 	private static void fallingEdge() {
-		/* 1. Turn clockwise
-		 * 2. Get alpha
-		 * 	2.1 while distance > (d + k) do nothing
-		 * 	   else get first alpha
-		 * 	2.2 while distance > (d - k) do nothing
-		 * 	   else get 2nd alpha
-		 * 	2.3 Get alpha avg
-		 * 3. Turn counter clockwise
-		 * 4. Get beta
-		 * 	4.1 while distance > (d + k) do nothing
-		 * 	   else get first alpha
-		 * 	4.2 while distance > (d - k) do nothing
-		 * 	   else get 2nd alpha
-		 * 	4.3 Get beta avg
-		 * 5. Calculate delta angle
-		 * 6. Add delta angle to odo reading
-		 */
-		
+
 		// constants used for the angles of the falling edges
 		double alpha_initial, alpha_final, alpha_avg;
 		double beta_initial, beta_final, beta_avg;
@@ -75,7 +77,7 @@ public class UltrasonicLocalizer implements Runnable {
 		// constant for the difference between alpha and beta
 		double deltaTheta;
 
-//		processUSData(distance);
+		//		processUSData(distance);
 
 		// set speeds
 		leftMotor.setSpeed(ROTATE_SPEED);
@@ -172,15 +174,15 @@ public class UltrasonicLocalizer implements Runnable {
 
 		// calculate halfway angle between alpha and beta
 		// Values of 57 and 255 were chosen based on testing
-		deltaTheta = alpha_avg > beta_avg ? (57.0 - (alpha_avg + beta_avg) / 2.0) : (255.0 - (alpha_avg + beta_avg) / 2.0);
-		
+		deltaTheta = alpha_avg > beta_avg ? (53.0 - (alpha_avg + beta_avg) / 2.0) : (245.0 - (alpha_avg + beta_avg) / 2.0);
+
 		// turn to delta T
 		leftMotor.rotate(convertAngle(deltaTheta), true);
 		rightMotor.rotate(-convertAngle(deltaTheta), false);
-		
+
 		leftMotor.stop(true);
 		rightMotor.stop(false);
-		
+
 		// done!
 		odometer.setTheta(0);
 		Sound.beepSequenceUp();
@@ -225,6 +227,7 @@ public class UltrasonicLocalizer implements Runnable {
 
 		// used for computing the angle of the falling edge
 		alpha_initial = odometer.getXYT()[2];
+		
 
 		// check for when exiting noise margin; this means it's a falling edge!
 		while (distance < d_rising + k_rising) {
@@ -236,9 +239,11 @@ public class UltrasonicLocalizer implements Runnable {
 		// used for computing the angle of the falling edge
 		alpha_final = odometer.getXYT()[2];
 
-		// TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
 		// angle of the falling edge
 		alpha_avg = (alpha_initial + alpha_final) / 2.0;
+		if(alpha_avg == 359 + DEG_ERR || alpha_avg == 359 - DEG_ERR) {
+			alpha_avg = 0.0;
+		}
 
 		leftMotor.stop(true);
 		rightMotor.stop(false);
@@ -275,27 +280,29 @@ public class UltrasonicLocalizer implements Runnable {
 		// used for computing the angle of the falling edge
 		beta_final = odometer.getXYT()[2];
 
-		// TODO: might need to handle wraparound at 360, in case one is like 1 degree and other is 359
+
 		// angle of the falling edge
 		beta_avg = (beta_initial + beta_final) / 2.0;
+		if(beta_avg == 359 + DEG_ERR || beta_avg == 359 - DEG_ERR) {
+			beta_avg = 0.0;
+		}
 
 		leftMotor.stop(true);
 		rightMotor.stop(false);
 		Sound.beep();
 
-		// found alpha and beta, so turn to set theta to 0, then turn by deltaTheta
-		// after the turn, angle should be correctly localized to 0 degrees
-		odometer.setTheta(0.0);
-
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
 
 		// calculate halfway angle between alpha and beta
-		deltaTheta = alpha_avg < beta_avg ? (135.0 - (alpha_avg + beta_avg) / 2.0) : (405.0 - (alpha_avg + beta_avg) / 2.0);
+		deltaTheta = alpha_avg < beta_avg ? (55.0 - (alpha_avg + beta_avg) / 2.0) : (235.0 - (alpha_avg + beta_avg) / 2.0);
 
 		// make the turn
 		leftMotor.rotate(convertAngle(deltaTheta), true);
 		rightMotor.rotate(-convertAngle(deltaTheta), false);
+		
+		leftMotor.stop(true);
+		rightMotor.stop(false);
 
 		// done!
 		odometer.setTheta(0);

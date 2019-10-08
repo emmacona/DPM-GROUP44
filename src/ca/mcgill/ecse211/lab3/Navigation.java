@@ -66,7 +66,6 @@ public class Navigation implements Runnable {
 			// set motor speeds
 			setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
 
-			// TODO: HANDLE OBSTACLE AVOIDANCE BETTER
 			while (!isDone(x, y)) { // while still not at the way point, check for obstacles
 				// Update coordinates
 				currentX = odometer.getXYT()[0];
